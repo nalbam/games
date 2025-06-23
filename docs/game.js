@@ -9,6 +9,51 @@ batImg.src = 'images/bat.png';
 rockImg.src = 'images/rock.png';
 logoImg.src = 'images/game.png';
 
+// 오디오 로드
+const sounds = {
+    takeoff: new Audio('sounds/Bat_takeoff.ogg'),
+    hurt1: new Audio('sounds/Bat_hurt1.ogg'),
+    hurt2: new Audio('sounds/Bat_hurt2.ogg'),
+    hurt3: new Audio('sounds/Bat_hurt3.ogg'),
+    idle1: new Audio('sounds/Bat_idle1.ogg'),
+    idle2: new Audio('sounds/Bat_idle2.ogg'),
+    idle3: new Audio('sounds/Bat_idle3.ogg'),
+    idle4: new Audio('sounds/Bat_idle4.ogg'),
+    explosion1: new Audio('sounds/Explosion1.ogg'),
+    explosion2: new Audio('sounds/Explosion2.ogg'),
+    explosion3: new Audio('sounds/Explosion3.ogg'),
+    explosion4: new Audio('sounds/Explosion4.ogg')
+};
+
+// 오디오 볼륨 설정
+Object.values(sounds).forEach(sound => {
+    sound.volume = 0.5;
+});
+
+// 랜덤 충돌 소리 재생 함수
+function playRandomHurtSound() {
+    const hurtSounds = [sounds.hurt1, sounds.hurt2, sounds.hurt3];
+    const randomSound = hurtSounds[Math.floor(Math.random() * hurtSounds.length)];
+    randomSound.currentTime = 0; // 소리 리셋
+    randomSound.play().catch(e => console.log('Audio play failed:', e));
+}
+
+// 랜덤 idle 소리 재생 함수
+function playRandomIdleSound() {
+    const idleSounds = [sounds.idle1, sounds.idle2, sounds.idle3, sounds.idle4];
+    const randomSound = idleSounds[Math.floor(Math.random() * idleSounds.length)];
+    randomSound.currentTime = 0; // 소리 리셋
+    randomSound.play().catch(e => console.log('Audio play failed:', e));
+}
+
+// 랜덤 폭발 소리 재생 함수
+function playRandomExplosionSound() {
+    const explosionSounds = [sounds.explosion1, sounds.explosion2, sounds.explosion3, sounds.explosion4];
+    const randomSound = explosionSounds[Math.floor(Math.random() * explosionSounds.length)];
+    randomSound.currentTime = 0; // 소리 리셋
+    randomSound.play().catch(e => console.log('Audio play failed:', e));
+}
+
 // Wait for images to load
 let imagesLoaded = 0;
 function imageLoaded() {
@@ -24,7 +69,7 @@ let gameOver = false;
 let score = 0;
 let countdown = 0;
 let countdownTimer = 0;
-let debugMode = true; // 디버그 모드 (충돌 영역 표시)
+let debugMode = false; // 디버그 모드 (충돌 영역 표시)
 
 // 박쥐
 const bat = {
@@ -65,6 +110,10 @@ function update() {
         if (countdownTimer >= 60) { // 1초마다
             countdown--;
             countdownTimer = 0;
+            // 카운트다운이 끝났을 때 idle 소리 재생
+            if (countdown === 0) {
+                playRandomIdleSound();
+            }
         }
         return;
     }
@@ -82,7 +131,7 @@ function update() {
         rockTimer++;
         if (rockTimer > 90) {
             const gapY = Math.random() * (canvas.height - rockGap - 100) + 50;
-            
+
             // 위쪽 바위 조각들 생성
             const topPieces = [];
             for (let y = 0; y < gapY; y += 45) {
@@ -133,7 +182,7 @@ function update() {
     // 바위 이동 및 물리 업데이트 (게임 오버 후에도 계속)
     for (let i = rocks.length - 1; i >= 0; i--) {
         const rock = rocks[i];
-        
+
         // 바위 이동 (게임 오버가 아닐 때만)
         if (!gameOver) {
             rock.x -= 3;
@@ -147,7 +196,7 @@ function update() {
                     piece.y += piece.velocityY;
                     piece.velocityY += rockPhysics.gravity;
                     piece.rotation += piece.rotationSpeed;
-                    
+
                     // 바닥 충돌 검사 (동굴 바닥)
                     if (piece.y + piece.height >= canvas.height - 30) {
                         piece.y = canvas.height - 30 - piece.height;
@@ -167,7 +216,7 @@ function update() {
                     piece.y += piece.velocityY;
                     piece.velocityY += rockPhysics.gravity;
                     piece.rotation += piece.rotationSpeed;
-                    
+
                     // 바닥 충돌 검사 (동굴 바닥)
                     if (piece.y + piece.height >= canvas.height - 30) {
                         piece.y = canvas.height - 30 - piece.height;
@@ -200,6 +249,10 @@ function update() {
 
     // 충돌 검사
     if (bat.y <= 0 || bat.y + bat.height >= canvas.height) {
+        if (!gameOver) {
+            playRandomHurtSound(); // 벽 충돌 소리 재생
+            playRandomExplosionSound(); // 폭발 소리 재생
+        }
         gameOver = true;
     }
 
@@ -211,7 +264,7 @@ function update() {
             for (let y = 0; y < rock.topHeight; y += 45) {
                 actualTopEnd = y + Math.min(50, rock.topHeight - y);
             }
-            
+
             // 위쪽 바위와 충돌 (바위 조각들 떨어뜨리기)
             if (bat.y < actualTopEnd - rockMargin && !rock.topCollapsed) {
                 rock.topCollapsed = true;
@@ -221,9 +274,11 @@ function update() {
                     piece.velocityY = Math.random() * 2 + 1;
                     piece.rotationSpeed = (Math.random() - 0.5) * 0.2;
                 });
+                playRandomHurtSound(); // 충돌 소리 재생
+                playRandomExplosionSound(); // 폭발 소리 재생
                 gameOver = true;
             }
-            
+
             // 아래쪽 바위와 충돌 (바위 조각들 넘어뜨리기)
             if (bat.y + bat.height > rock.bottomY + rockMargin && !rock.bottomCollapsed) {
                 rock.bottomCollapsed = true;
@@ -234,6 +289,8 @@ function update() {
                     piece.velocityY = Math.random() * 2;
                     piece.rotationSpeed = direction * (Math.random() * 0.15 + 0.05);
                 });
+                playRandomHurtSound(); // 충돌 소리 재생
+                playRandomExplosionSound(); // 폭발 소리 재생
                 gameOver = true;
             }
         }
@@ -280,7 +337,7 @@ function draw() {
                 ctx.drawImage(rockImg, rock.x, y, rockWidth, Math.min(50, rock.topHeight - y));
             }
         }
-        
+
         // Bottom rocks - 개별 조각 렌더링
         if (rock.bottomCollapsed) {
             rock.bottomPieces.forEach(piece => {
@@ -365,6 +422,9 @@ document.addEventListener('keydown', (e) => {
             countdownTimer = 0;
         } else if (!gameOver && countdown === 0) {
             bat.velocity = bat.jump;
+            // 날개짓 소리 재생
+            sounds.takeoff.currentTime = 0; // 소리 리셋
+            sounds.takeoff.play().catch(e => console.log('Audio play failed:', e));
         }
     } else if (e.code === 'KeyR') {
         e.preventDefault();
