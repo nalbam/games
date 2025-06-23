@@ -156,8 +156,15 @@ function draw() {
             const rockMargin = rockWidth * 0.05;
             ctx.strokeStyle = 'blue';
             ctx.lineWidth = 2;
-            // Top rock collision area
-            ctx.strokeRect(rock.x + rockMargin, 0, rockWidth - rockMargin * 2, rock.topHeight - rockMargin);
+            // Top rock collision area - 실제 바위가 그려지는 끝점까지 계산
+            // 마지막으로 그려지는 바위의 시작 Y좌표 찾기
+            let lastDrawnRockY = 0;
+            for (let y = 0; y < rock.topHeight; y += 45) {
+                lastDrawnRockY = y;
+            }
+            // 실제 바위 끝점 = 마지막 바위 시작점 + 바위 높이(50)
+            const actualTopEnd = lastDrawnRockY + 50;
+            ctx.strokeRect(rock.x + rockMargin, 0, rockWidth - rockMargin * 2, actualTopEnd - rockMargin);
             // Bottom rock collision area
             ctx.strokeRect(rock.x + rockMargin, rock.bottomY + rockMargin, rockWidth - rockMargin * 2, canvas.height - (rock.bottomY + rockMargin));
         }
