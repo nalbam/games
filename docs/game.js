@@ -4,10 +4,12 @@ const ctx = canvas.getContext('2d');
 // 이미지 로드
 const batImg1 = new Image(); // 날개 펴기
 const batImg2 = new Image(); // 날개 접기
+const batImgX = new Image(); // 충돌/사망 상태
 const rockImg = new Image();
 const logoImg = new Image();
 batImg1.src = 'images/bat1.png';
 batImg2.src = 'images/bat2.png';
+batImgX.src = 'images/batx.png';
 rockImg.src = 'images/rock.png';
 logoImg.src = 'images/game.png';
 
@@ -58,12 +60,13 @@ function playRandomExplosionSound() {
 
 // Wait for images to load
 let imagesLoaded = 0;
-const totalImages = 4;
+const totalImages = 5;
 function imageLoaded() {
     imagesLoaded++;
 }
 batImg1.onload = imageLoaded;
 batImg2.onload = imageLoaded;
+batImgX.onload = imageLoaded;
 rockImg.onload = imageLoaded;
 logoImg.onload = imageLoaded;
 
@@ -89,7 +92,11 @@ const bat = {
     animationTimer: 0,
     isFlapping: false,
     flapDuration: 0,
-    flapPhase: 0 // 0: 펼치기, 1: 접기
+    flapPhase: 0, // 0: 펼치기, 1: 접기
+    // 충돌 상태
+    isDead: false,
+    deathRotation: 0,
+    deathRotationSpeed: 0
 };
 
 // 바위 (장애물)
@@ -130,13 +137,27 @@ function update() {
 
     if (!gameStarted) return;
 
-    // 박쥐 물리 (게임 오버가 아닐 때만)
+    // 박쥐 물리
     if (!gameOver) {
         bat.velocity += bat.gravity;
         bat.y += bat.velocity;
         
         // 박쥐 애니메이션 업데이트
         updateBatAnimation();
+    } else if (bat.isDead) {
+        // 게임 오버 후에도 박쥐는 계속 떨어짐
+        bat.velocity += bat.gravity;
+        bat.y += bat.velocity;
+        
+        // 회전 애니메이션
+        bat.deathRotation += bat.deathRotationSpeed;
+        
+        // 바닥에 닿으면 정지
+        if (bat.y + bat.height >= canvas.height - 30) {
+            bat.y = canvas.height - 30 - bat.height;
+            bat.velocity = 0;
+            bat.deathRotationSpeed *= 0.8; // 회전 감속
+        }
     }
 
     // 바위 생성 (게임 오버가 아닐 때만)
@@ -265,6 +286,9 @@ function update() {
         if (!gameOver) {
             playRandomHurtSound(); // 벽 충돌 소리 재생
             playRandomExplosionSound(); // 폭발 소리 재생
+            // 충돌 시 박쥐 상태 변경
+            bat.isDead = true;
+            bat.deathRotationSpeed = (Math.random() - 0.5) * 0.3; // 랜덤 회전 속도
         }
         gameOver = true;
     }
@@ -289,6 +313,9 @@ function update() {
                 });
                 playRandomHurtSound(); // 충돌 소리 재생
                 playRandomExplosionSound(); // 폭발 소리 재생
+                // 충돌 시 박쥐 상태 변경
+                bat.isDead = true;
+                bat.deathRotationSpeed = (Math.random() - 0.5) * 0.3; // 랜덤 회전 속도
                 gameOver = true;
             }
 
@@ -304,6 +331,9 @@ function update() {
                 });
                 playRandomHurtSound(); // 충돌 소리 재생
                 playRandomExplosionSound(); // 폭발 소리 재생
+                // 충돌 시 박쥐 상태 변경
+                bat.isDead = true;
+                bat.deathRotationSpeed = (Math.random() - 0.5) * 0.3; // 랜덤 회전 속도
                 gameOver = true;
             }
         }
@@ -339,6 +369,11 @@ function updateBatAnimation() {
 
 // 현재 박쥐 이미지 반환 함수
 function getCurrentBatImage() {
+    // 충돌/사망 상태일 때
+    if (bat.isDead) {
+        return batImgX;
+    }
+    
     // 점프 애니메이션 중일 때
     if (bat.isFlapping) {
         return bat.flapPhase === 0 ? batImg1 : batImg2; // 0: 펼치기, 1: 접기
@@ -438,7 +473,18 @@ function draw() {
 
     // 박쥐
     const currentBatImg = getCurrentBatImage();
-    ctx.drawImage(currentBatImg, bat.x, bat.y, bat.width, bat.height);
+    
+    if (bat.isDead && bat.deathRotation !== 0) {
+        // 회전하면서 그리기
+        ctx.save();
+        ctx.translate(bat.x + bat.width/2, bat.y + bat.height/2);
+        ctx.rotate(bat.deathRotation);
+        ctx.drawImage(currentBatImg, -bat.width/2, -bat.height/2, bat.width, bat.height);
+        ctx.restore();
+    } else {
+        // 일반 그리기
+        ctx.drawImage(currentBatImg, bat.x, bat.y, bat.width, bat.height);
+    }
 
     // 박쥐 충돌 영역 표시 (디버그 모드)
     if (debugMode) {
@@ -518,6 +564,9 @@ document.addEventListener('keydown', (e) => {
             bat.isFlapping = false;
             bat.flapDuration = 0;
             bat.flapPhase = 0;
+            bat.isDead = false;
+            bat.deathRotation = 0;
+            bat.deathRotationSpeed = 0;
             rocks.length = 0;
             rockTimer = 0;
             score = 0;
