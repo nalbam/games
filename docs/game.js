@@ -110,7 +110,13 @@ function update() {
     for (const rock of rocks) {
         const rockMargin = rockWidth * 0.05;
         if (bat.x < rock.x + rockWidth - rockMargin && bat.x + bat.width > rock.x + rockMargin) {
-            if (bat.y < rock.topHeight - rockMargin || bat.y + bat.height > rock.bottomY + rockMargin) {
+            // 실제 바위가 그려지는 끝점까지 충돌 검사
+            let lastDrawnRockY = 0;
+            for (let y = 0; y < rock.topHeight; y += 45) {
+                lastDrawnRockY = y;
+            }
+            const actualTopEnd = lastDrawnRockY + 50;
+            if (bat.y < actualTopEnd - rockMargin || bat.y + bat.height > rock.bottomY + rockMargin) {
                 gameOver = true;
             }
         }
