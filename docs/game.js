@@ -27,10 +27,10 @@ let countdownTimer = 0;
 
 // 박쥐
 const bat = {
-    x: 100,
-    y: 320,
-    width: 30,
-    height: 20,
+    x: 150,
+    y: 300,
+    width: 40,
+    height: 30,
     velocity: 0,
     gravity: 0.5,
     jump: -8
@@ -38,8 +38,8 @@ const bat = {
 
 // 바위 (장애물)
 const rocks = [];
-const rockWidth = 60;
-const rockGap = 150;
+const rockWidth = 80;
+const rockGap = 180;
 let rockTimer = 0;
 let caveOffset = 0;
 
@@ -127,7 +127,7 @@ function draw() {
     }
 
     if (!gameStarted) {
-        ctx.drawImage(logoImg, canvas.width/2 - 120, canvas.height/2 - 150, 240, 240);
+        ctx.drawImage(logoImg, canvas.width/2 - 150, canvas.height/2 - 120, 300, 240);
         ctx.fillStyle = '#fff';
         ctx.font = '24px Arial';
         ctx.textAlign = 'center';
@@ -196,7 +196,7 @@ document.addEventListener('keydown', (e) => {
             gameStarted = true;
             countdown = 3;
             countdownTimer = 0;
-            bat.y = 320;
+            bat.y = 300;
             bat.velocity = 0;
             rocks.length = 0;
             rockTimer = 0;
