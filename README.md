@@ -29,19 +29,31 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 ## Game Features
 
 - **Fullscreen Display**: Responsive design that fills the entire browser window
-- **Realistic Physics**: Gravity and momentum-based flight
+- **Realistic Physics**: Gravity and momentum-based flight with destructible rocks
 - **Scrolling Cave**: Moving rocky ceiling and floor
 - **Random Obstacles**: Procedurally generated rock pillars
 - **Score System**: Track obstacles successfully passed
 - **Visual Graphics**: Custom bat and rock sprites
 - **Smooth Animation**: 60 FPS game loop
 - **Countdown Timer**: 3-second countdown before game starts
-- **Forgiving Collision**: Optimized hitbox for better gameplay experience
+- **Dynamic Rock Physics**: Rocks break into individual pieces when hit
+- **Realistic Destruction**: Rock pieces fall with gravity and bounce realistically
+- **Sound Effects**: Immersive audio including wing flaps, collisions, and explosions
+- **Debug Mode**: Visual collision area display (disabled by default)
+- **Precise Collision**: Accurate collision detection matching visual rock boundaries
 
 ## Game Assets
 
+### Images
 - **Bat Sprite**: [bat.png](./docs/images/bat.png)
 - **Rock Texture**: [rock.png](./docs/images/rock.png)
+- **Game Logo**: [game.png](./docs/images/game.png)
+
+### Sound Effects
+- **Wing Flap**: [Bat_takeoff.ogg](./docs/sounds/Bat_takeoff.ogg)
+- **Idle Sounds**: Bat_idle1-4.ogg (4 variations)
+- **Pain Sounds**: Bat_hurt1-3.ogg (3 variations)
+- **Explosion Effects**: Explosion1-4.ogg (4 variations)
 
 ## Source Code
 
@@ -56,21 +68,57 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 
 ## Game Mechanics
 
+### Basic Physics
 - **Screen Size**: 800x600 pixels (fullscreen display)
 - **Bat Size**: 40x30 pixels
 - **Jump Force**: -8 velocity units
-- **Gravity**: 0.5 acceleration per frame
+- **Gravity**: 0.5 acceleration per frame (bat), 0.3 (rock pieces)
 - **Obstacle Speed**: 3 pixels per frame
 - **Rock Width**: 80 pixels
 - **Gap Size**: 180 pixels between rock pillars
 - **Spawn Rate**: New obstacle every 90 frames (~1.5 seconds)
-- **Collision Detection**: Bat 100%, Rocks 95% (forgiving hitbox)
+
+### Collision & Destruction
+- **Collision Detection**: Precise collision matching visual boundaries
+- **Rock Destruction**: Individual 45-pixel rock pieces with physics
+- **Top Rock Behavior**: Falls and scatters on collision
+- **Bottom Rock Behavior**: Tips over in collision direction
+- **Ground Contact**: Rock pieces settle on cave floor (30px from bottom)
+- **Friction**: 0.7 coefficient when pieces hit ground
+
+### Audio System
+- **Wing Flap**: Plays on every SPACEBAR press
+- **Game Start**: Random idle sound after countdown
+- **Collision**: Simultaneous hurt + explosion sounds
+- **Volume**: All sounds at 50% volume
 
 ## Development
 
 This game was developed using **Amazon Q Developer**, an AI-powered coding assistant that helped with:
 - Game logic implementation
-- Physics and collision detection
+- Advanced physics and collision detection
+- Dynamic rock destruction system
 - Image rendering and animation
+- Audio system integration
 - Score tracking system
 - Code optimization and debugging
+
+## Technical Features
+
+### Rock Physics Engine
+- Individual rock pieces with unique physics properties
+- Realistic gravity, rotation, and collision mechanics
+- Dynamic destruction based on collision direction
+- Ground friction and settling behavior
+
+### Sound System
+- Multiple audio file format support (.ogg)
+- Random sound selection for variety
+- Audio error handling and fallback
+- Optimized audio loading and playback
+
+### Visual Effects
+- Real-time rock breaking animation
+- Smooth 60 FPS rendering
+- Debug mode for collision visualization
+- Responsive canvas scaling
