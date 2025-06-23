@@ -33,9 +33,11 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 - **Scrolling Cave**: Moving rocky ceiling and floor
 - **Random Obstacles**: Procedurally generated rock pillars
 - **Score System**: Track obstacles successfully passed
-- **Visual Graphics**: Custom bat and rock sprites
+- **Visual Graphics**: Custom bat and rock sprites with smooth animations
+- **Bat Animation System**: Dynamic wing animation based on movement
 - **Smooth Animation**: 60 FPS game loop
 - **Countdown Timer**: 3-second countdown before game starts
+- **Asset Loading**: Safe image loading with loading screen
 - **Dynamic Rock Physics**: Rocks break into individual pieces when hit
 - **Realistic Destruction**: Rock pieces fall with gravity and bounce realistically
 - **Sound Effects**: Immersive audio including wing flaps, collisions, and explosions
@@ -45,7 +47,9 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 ## Game Assets
 
 ### Images
-- **Bat Sprite**: [bat.png](./docs/images/bat.png)
+- **Bat Animation Sprites**: 
+  - [bat1.png](./docs/images/bat1.png) - Wings spread (gliding/falling)
+  - [bat2.png](./docs/images/bat2.png) - Wings folded (jumping/flapping)
 - **Rock Texture**: [rock.png](./docs/images/rock.png)
 - **Game Logo**: [game.png](./docs/images/game.png)
 
@@ -77,6 +81,14 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 - **Rock Width**: 80 pixels
 - **Gap Size**: 180 pixels between rock pillars
 - **Spawn Rate**: New obstacle every 90 frames (~1.5 seconds)
+- **Cave Boundaries**: 30px ceiling and floor collision zones
+
+### Animation System
+- **Jump Animation**: Wings spread (bat1) → Wings folded (bat2)
+- **Falling Animation**: Wings spread for gliding
+- **Idle Animation**: Natural wing flapping cycle (20 frames)
+- **Rapid Input**: Faster wing animation on consecutive jumps
+- **Animation Timing**: 12 frames (normal), 8 frames (rapid)
 
 ### Collision & Destruction
 - **Collision Detection**: Precise collision matching visual boundaries
@@ -94,12 +106,15 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 
 ## Development
 
-This game was developed using **Amazon Q Developer**, an AI-powered coding assistant that helped with:
+This game was developed using **Claude Code**, an AI-powered coding assistant that helped with:
 - Game logic implementation
 - Advanced physics and collision detection
 - Dynamic rock destruction system
-- Image rendering and animation
+- Bat animation system implementation
+- Image rendering and smooth animations
 - Audio system integration
+- Asset loading and error handling
+- Cave boundary collision fixes
 - Score tracking system
 - Code optimization and debugging
 
@@ -119,6 +134,16 @@ This game was developed using **Amazon Q Developer**, an AI-powered coding assis
 
 ### Visual Effects
 - Real-time rock breaking animation
+- Dynamic bat wing animations
 - Smooth 60 FPS rendering
+- Asset loading screen with progress indicator
 - Debug mode for collision visualization
 - Responsive canvas scaling
+
+### Recent Updates
+- **Bat Animation System**: Added dynamic wing animations with bat1.png and bat2.png sprites
+- **Movement-Based Animation**: Wings respond to jump, fall, and idle states
+- **Rapid Input Handling**: Faster wing flapping for consecutive key presses
+- **Cave Collision Fix**: Accurate collision detection for 30px cave boundaries
+- **Safe Asset Loading**: Loading screen prevents game start until all images are ready
+- **Animation Timing**: Optimized wing animation cycles for natural movement
