@@ -44,6 +44,13 @@ const rockGap = 180;
 let rockTimer = 0;
 let caveOffset = 0;
 
+// 바위 물리 상태
+const rockPhysics = {
+    gravity: 0.3,
+    rotationSpeed: 0.05,
+    fallSpeed: 2
+};
+
 // 게임 루프
 function gameLoop() {
     update();
@@ -52,8 +59,6 @@ function gameLoop() {
 }
 
 function update() {
-    if (gameOver) return;
-
     // 카운트다운 처리
     if (gameStarted && countdown > 0) {
         countdownTimer++;
@@ -66,41 +71,132 @@ function update() {
 
     if (!gameStarted) return;
 
-    // 박쥐 물리
-    bat.velocity += bat.gravity;
-    bat.y += bat.velocity;
-
-    // 바위 생성
-    rockTimer++;
-    if (rockTimer > 90) {
-        const gapY = Math.random() * (canvas.height - rockGap - 100) + 50;
-        rocks.push({
-            x: canvas.width,
-            topHeight: gapY,
-            bottomY: gapY + rockGap,
-            passed: false
-        });
-        rockTimer = 0;
+    // 박쥐 물리 (게임 오버가 아닐 때만)
+    if (!gameOver) {
+        bat.velocity += bat.gravity;
+        bat.y += bat.velocity;
     }
 
-    // 바위 이동
-    for (let i = rocks.length - 1; i >= 0; i--) {
-        rocks[i].x -= 3;
+    // 바위 생성 (게임 오버가 아닐 때만)
+    if (!gameOver) {
+        rockTimer++;
+        if (rockTimer > 90) {
+            const gapY = Math.random() * (canvas.height - rockGap - 100) + 50;
+            
+            // 위쪽 바위 조각들 생성
+            const topPieces = [];
+            for (let y = 0; y < gapY; y += 45) {
+                topPieces.push({
+                    x: 0,
+                    y: y,
+                    width: rockWidth,
+                    height: Math.min(50, gapY - y),
+                    velocityX: 0,
+                    velocityY: 0,
+                    rotation: 0,
+                    rotationSpeed: (Math.random() - 0.5) * 0.1,
+                    onGround: false
+                });
+            }
 
-        // 점수 계산
-        if (!rocks[i].passed && rocks[i].x + rockWidth < bat.x) {
-            rocks[i].passed = true;
+            // 아래쪽 바위 조각들 생성
+            const bottomPieces = [];
+            for (let y = gapY + rockGap; y < canvas.height - 30; y += 45) {
+                bottomPieces.push({
+                    x: 0,
+                    y: y,
+                    width: rockWidth,
+                    height: Math.min(50, canvas.height - 30 - y),
+                    velocityX: 0,
+                    velocityY: 0,
+                    rotation: 0,
+                    rotationSpeed: (Math.random() - 0.5) * 0.1,
+                    onGround: false
+                });
+            }
+
+            rocks.push({
+                x: canvas.width,
+                topHeight: gapY,
+                bottomY: gapY + rockGap,
+                passed: false,
+                // 물리 상태
+                topCollapsed: false,
+                bottomCollapsed: false,
+                topPieces: topPieces,
+                bottomPieces: bottomPieces
+            });
+            rockTimer = 0;
+        }
+    }
+
+    // 바위 이동 및 물리 업데이트 (게임 오버 후에도 계속)
+    for (let i = rocks.length - 1; i >= 0; i--) {
+        const rock = rocks[i];
+        
+        // 바위 이동 (게임 오버가 아닐 때만)
+        if (!gameOver) {
+            rock.x -= 3;
+        }
+
+        // 바위 조각들 물리 효과 업데이트 (항상 실행)
+        if (rock.topCollapsed) {
+            rock.topPieces.forEach(piece => {
+                if (!piece.onGround) {
+                    piece.x += piece.velocityX;
+                    piece.y += piece.velocityY;
+                    piece.velocityY += rockPhysics.gravity;
+                    piece.rotation += piece.rotationSpeed;
+                    
+                    // 바닥 충돌 검사 (동굴 바닥)
+                    if (piece.y + piece.height >= canvas.height - 30) {
+                        piece.y = canvas.height - 30 - piece.height;
+                        piece.velocityY = 0;
+                        piece.velocityX *= 0.7; // 마찰
+                        piece.rotationSpeed *= 0.8;
+                        piece.onGround = true;
+                    }
+                }
+            });
+        }
+
+        if (rock.bottomCollapsed) {
+            rock.bottomPieces.forEach(piece => {
+                if (!piece.onGround) {
+                    piece.x += piece.velocityX;
+                    piece.y += piece.velocityY;
+                    piece.velocityY += rockPhysics.gravity;
+                    piece.rotation += piece.rotationSpeed;
+                    
+                    // 바닥 충돌 검사 (동굴 바닥)
+                    if (piece.y + piece.height >= canvas.height - 30) {
+                        piece.y = canvas.height - 30 - piece.height;
+                        piece.velocityY = 0;
+                        piece.velocityX *= 0.7; // 마찰
+                        piece.rotationSpeed *= 0.8;
+                        piece.onGround = true;
+                    }
+                }
+            });
+        }
+
+        // 점수 계산 (게임 오버가 아닐 때만)
+        if (!gameOver && !rock.passed && rock.x + rockWidth < bat.x) {
+            rock.passed = true;
             score++;
         }
 
-        if (rocks[i].x + rockWidth < 0) {
+        // 바위 제거 (게임 오버가 아닐 때만)
+        if (!gameOver && rock.x + rockWidth < 0) {
             rocks.splice(i, 1);
         }
     }
 
-    // 동굴 스크롤
-    caveOffset -= 3;
-    if (caveOffset <= -45) caveOffset = 0;
+    // 동굴 스크롤 (게임 오버가 아닐 때만)
+    if (!gameOver) {
+        caveOffset -= 3;
+        if (caveOffset <= -45) caveOffset = 0;
+    }
 
     // 충돌 검사
     if (bat.y <= 0 || bat.y + bat.height >= canvas.height) {
@@ -110,13 +206,34 @@ function update() {
     for (const rock of rocks) {
         const rockMargin = rockWidth * 0.05;
         if (bat.x < rock.x + rockWidth - rockMargin && bat.x + bat.width > rock.x + rockMargin) {
-            // 실제 바위가 그려지는 끝점까지 충돌 검사
-            let lastDrawnRockY = 0;
+            // 실제 바위가 그려지는 끝점까지 충돌 검사 (렌더링과 동일한 로직)
+            let actualTopEnd = 0;
             for (let y = 0; y < rock.topHeight; y += 45) {
-                lastDrawnRockY = y;
+                actualTopEnd = y + Math.min(50, rock.topHeight - y);
             }
-            const actualTopEnd = lastDrawnRockY + 50;
-            if (bat.y < actualTopEnd - rockMargin || bat.y + bat.height > rock.bottomY + rockMargin) {
+            
+            // 위쪽 바위와 충돌 (바위 조각들 떨어뜨리기)
+            if (bat.y < actualTopEnd - rockMargin && !rock.topCollapsed) {
+                rock.topCollapsed = true;
+                // 각 조각에 랜덤한 초기 속도 부여
+                rock.topPieces.forEach(piece => {
+                    piece.velocityX = (Math.random() - 0.5) * 4;
+                    piece.velocityY = Math.random() * 2 + 1;
+                    piece.rotationSpeed = (Math.random() - 0.5) * 0.2;
+                });
+                gameOver = true;
+            }
+            
+            // 아래쪽 바위와 충돌 (바위 조각들 넘어뜨리기)
+            if (bat.y + bat.height > rock.bottomY + rockMargin && !rock.bottomCollapsed) {
+                rock.bottomCollapsed = true;
+                // 충돌 방향에 따른 초기 속도 설정
+                const direction = bat.x < rock.x + rockWidth / 2 ? 1 : -1;
+                rock.bottomPieces.forEach(piece => {
+                    piece.velocityX = direction * (Math.random() * 3 + 2);
+                    piece.velocityY = Math.random() * 2;
+                    piece.rotationSpeed = direction * (Math.random() * 0.15 + 0.05);
+                });
                 gameOver = true;
             }
         }
@@ -148,13 +265,36 @@ function draw() {
 
     // Rocks
     for (const rock of rocks) {
-        // Top rocks
-        for (let y = 0; y < rock.topHeight; y += 45) {
-            ctx.drawImage(rockImg, rock.x, y, rockWidth, 50);
+        // Top rocks - 개별 조각 렌더링
+        if (rock.topCollapsed) {
+            rock.topPieces.forEach(piece => {
+                ctx.save();
+                ctx.translate(rock.x + piece.x + piece.width/2, piece.y + piece.height/2);
+                ctx.rotate(piece.rotation);
+                ctx.drawImage(rockImg, -piece.width/2, -piece.height/2, piece.width, piece.height);
+                ctx.restore();
+            });
+        } else {
+            // 정상 상태 렌더링
+            for (let y = 0; y < rock.topHeight; y += 45) {
+                ctx.drawImage(rockImg, rock.x, y, rockWidth, Math.min(50, rock.topHeight - y));
+            }
         }
-        // Bottom rocks
-        for (let y = rock.bottomY; y < canvas.height; y += 45) {
-            ctx.drawImage(rockImg, rock.x, y, rockWidth, 50);
+        
+        // Bottom rocks - 개별 조각 렌더링
+        if (rock.bottomCollapsed) {
+            rock.bottomPieces.forEach(piece => {
+                ctx.save();
+                ctx.translate(rock.x + piece.x + piece.width/2, piece.y + piece.height/2);
+                ctx.rotate(piece.rotation);
+                ctx.drawImage(rockImg, -piece.width/2, -piece.height/2, piece.width, piece.height);
+                ctx.restore();
+            });
+        } else {
+            // 정상 상태 렌더링
+            for (let y = rock.bottomY; y < canvas.height - 30; y += 45) {
+                ctx.drawImage(rockImg, rock.x, y, rockWidth, Math.min(50, canvas.height - 30 - y));
+            }
         }
 
         // 바위 충돌 영역 표시 (디버그 모드)
@@ -162,14 +302,11 @@ function draw() {
             const rockMargin = rockWidth * 0.05;
             ctx.strokeStyle = 'blue';
             ctx.lineWidth = 2;
-            // Top rock collision area - 실제 바위가 그려지는 끝점까지 계산
-            // 마지막으로 그려지는 바위의 시작 Y좌표 찾기
-            let lastDrawnRockY = 0;
+            // Top rock collision area - 실제 바위가 그려지는 끝점까지 계산 (렌더링과 동일한 로직)
+            let actualTopEnd = 0;
             for (let y = 0; y < rock.topHeight; y += 45) {
-                lastDrawnRockY = y;
+                actualTopEnd = y + Math.min(50, rock.topHeight - y);
             }
-            // 실제 바위 끝점 = 마지막 바위 시작점 + 바위 높이(50)
-            const actualTopEnd = lastDrawnRockY + 50;
             ctx.strokeRect(rock.x + rockMargin, 0, rockWidth - rockMargin * 2, actualTopEnd - rockMargin);
             // Bottom rock collision area
             ctx.strokeRect(rock.x + rockMargin, rock.bottomY + rockMargin, rockWidth - rockMargin * 2, canvas.height - (rock.bottomY + rockMargin));
