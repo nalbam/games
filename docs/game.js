@@ -22,6 +22,8 @@ logoImg.onload = imageLoaded;
 let gameStarted = false;
 let gameOver = false;
 let score = 0;
+let countdown = 0;
+let countdownTimer = 0;
 
 // 박쥐
 const bat = {
@@ -49,7 +51,19 @@ function gameLoop() {
 }
 
 function update() {
-    if (!gameStarted || gameOver) return;
+    if (gameOver) return;
+    
+    // 카운트다운 처리
+    if (gameStarted && countdown > 0) {
+        countdownTimer++;
+        if (countdownTimer >= 60) { // 1초마다
+            countdown--;
+            countdownTimer = 0;
+        }
+        return;
+    }
+    
+    if (!gameStarted) return;
 
     // 박쥐 물리
     bat.velocity += bat.gravity;
@@ -120,6 +134,15 @@ function draw() {
         ctx.fillText('Press SPACE to start', canvas.width/2, canvas.height/2 + 150);
         return;
     }
+    
+    // 카운트다운 표시
+    if (countdown > 0) {
+        ctx.fillStyle = '#fff';
+        ctx.font = '48px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(countdown, canvas.width/2, canvas.height/2);
+        return;
+    }
 
     // 박쥐
     ctx.drawImage(batImg, bat.x, bat.y, bat.width, bat.height);
@@ -150,7 +173,7 @@ function draw() {
         ctx.textAlign = 'center';
         ctx.fillText('Game Over!', canvas.width/2, canvas.height/2);
         ctx.fillText('Score: ' + score, canvas.width/2, canvas.height/2 + 30);
-        ctx.fillText('Press SPACE to restart', canvas.width/2, canvas.height/2 + 60);
+        ctx.fillText('Press R to restart', canvas.width/2, canvas.height/2 + 60);
     }
 }
 
@@ -160,17 +183,25 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         if (!gameStarted) {
             gameStarted = true;
-        } else if (gameOver) {
+            countdown = 3;
+            countdownTimer = 0;
+        } else if (!gameOver && countdown === 0) {
+            bat.velocity = bat.jump;
+        }
+    } else if (e.code === 'KeyR') {
+        e.preventDefault();
+        if (gameOver) {
             // 재시작
             gameOver = false;
+            gameStarted = true;
+            countdown = 3;
+            countdownTimer = 0;
             bat.y = 320;
             bat.velocity = 0;
             rocks.length = 0;
             rockTimer = 0;
             score = 0;
             caveOffset = 0;
-        } else {
-            bat.velocity = bat.jump;
         }
     }
 });
