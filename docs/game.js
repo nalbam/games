@@ -24,6 +24,7 @@ let gameOver = false;
 let score = 0;
 let countdown = 0;
 let countdownTimer = 0;
+let debugMode = true; // 디버그 모드 (충돌 영역 표시)
 
 // 박쥐
 const bat = {
@@ -52,7 +53,7 @@ function gameLoop() {
 
 function update() {
     if (gameOver) return;
-    
+
     // 카운트다운 처리
     if (gameStarted && countdown > 0) {
         countdownTimer++;
@@ -62,7 +63,7 @@ function update() {
         }
         return;
     }
-    
+
     if (!gameStarted) return;
 
     // 박쥐 물리
@@ -85,18 +86,18 @@ function update() {
     // 바위 이동
     for (let i = rocks.length - 1; i >= 0; i--) {
         rocks[i].x -= 3;
-        
+
         // 점수 계산
         if (!rocks[i].passed && rocks[i].x + rockWidth < bat.x) {
             rocks[i].passed = true;
             score++;
         }
-        
+
         if (rocks[i].x + rockWidth < 0) {
             rocks.splice(i, 1);
         }
     }
-    
+
     // 동굴 스크롤
     caveOffset -= 3;
     if (caveOffset <= -45) caveOffset = 0;
@@ -107,7 +108,7 @@ function update() {
     }
 
     for (const rock of rocks) {
-        const rockMargin = rockWidth * 0.025;
+        const rockMargin = rockWidth * 0.05;
         if (bat.x < rock.x + rockWidth - rockMargin && bat.x + bat.width > rock.x + rockMargin) {
             if (bat.y < rock.topHeight - rockMargin || bat.y + bat.height > rock.bottomY + rockMargin) {
                 gameOver = true;
@@ -120,12 +121,6 @@ function draw() {
     // 배경
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Cave ceiling and floor
-    for (let x = caveOffset; x < canvas.width + 50; x += 45) {
-        ctx.drawImage(rockImg, x, 0, 50, 30); // Top ceiling
-        ctx.drawImage(rockImg, x, canvas.height - 30, 50, 30); // Bottom floor
-    }
 
     if (!gameStarted) {
         ctx.drawImage(logoImg, canvas.width/2 - 150, canvas.height/2 - 120, 300, 240);
@@ -135,7 +130,7 @@ function draw() {
         ctx.fillText('Press SPACE to start', canvas.width/2, canvas.height/2 + 150);
         return;
     }
-    
+
     // 카운트다운 표시
     if (countdown > 0) {
         ctx.fillStyle = '#fff';
@@ -144,9 +139,6 @@ function draw() {
         ctx.fillText(countdown, canvas.width/2, canvas.height/2);
         return;
     }
-
-    // 박쥐
-    ctx.drawImage(batImg, bat.x, bat.y, bat.width, bat.height);
 
     // Rocks
     for (const rock of rocks) {
@@ -158,6 +150,41 @@ function draw() {
         for (let y = rock.bottomY; y < canvas.height; y += 45) {
             ctx.drawImage(rockImg, rock.x, y, rockWidth, 50);
         }
+
+        // 바위 충돌 영역 표시 (디버그 모드)
+        if (debugMode) {
+            const rockMargin = rockWidth * 0.05;
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            // Top rock collision area
+            ctx.strokeRect(rock.x + rockMargin, 0, rockWidth - rockMargin * 2, rock.topHeight - rockMargin);
+            // Bottom rock collision area
+            ctx.strokeRect(rock.x + rockMargin, rock.bottomY + rockMargin, rockWidth - rockMargin * 2, canvas.height - (rock.bottomY + rockMargin));
+        }
+    }
+
+    // 박쥐
+    ctx.drawImage(batImg, bat.x, bat.y, bat.width, bat.height);
+
+    // 박쥐 충돌 영역 표시 (디버그 모드)
+    if (debugMode) {
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(bat.x, bat.y, bat.width, bat.height);
+    }
+
+    // Cave ceiling and floor (가장 앞에 렌더링)
+    for (let x = caveOffset; x < canvas.width + 50; x += 45) {
+        ctx.drawImage(rockImg, x, 0, 50, 30); // Top ceiling
+        ctx.drawImage(rockImg, x, canvas.height - 30, 50, 30); // Bottom floor
+    }
+
+    // 동굴 벽 충돌 영역 표시 (디버그 모드)
+    if (debugMode) {
+        ctx.strokeStyle = 'yellow';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 0, canvas.width, 30); // Top ceiling collision
+        ctx.strokeRect(0, canvas.height - 30, canvas.width, 30); // Bottom floor collision
     }
 
     // 점수 표시
@@ -167,7 +194,7 @@ function draw() {
         ctx.textAlign = 'left';
         ctx.fillText('Score: ' + score, 20, 40);
     }
-    
+
     if (gameOver) {
         ctx.fillStyle = '#fff';
         ctx.font = '24px Arial';
