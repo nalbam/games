@@ -1,6 +1,45 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// 고해상도 지원을 위한 설정
+const dpr = window.devicePixelRatio || 1;
+const canvasWidth = 1600;
+const canvasHeight = 1200;
+
+// 캔버스 반응형 크기 조정 함수
+function resizeCanvas() {
+    const container = document.getElementById('gameContainer');
+    const rect = container.getBoundingClientRect();
+    
+    // 캔버스 실제 렌더링 크기 (고해상도)
+    canvas.width = canvasWidth * dpr;
+    canvas.height = canvasHeight * dpr;
+    
+    // CSS 표시 크기는 컨테이너에 맞춤
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    
+    // 컨텍스트 스케일링
+    ctx.scale(dpr, dpr);
+    
+    // 이미지 스무딩 활성화
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+}
+
+// 초기 캔버스 크기 설정
+resizeCanvas();
+
+// 창 크기 변경 시 캔버스 크기 조정
+window.addEventListener('resize', () => {
+    resizeCanvas();
+});
+
+// 화면 회전 감지 (모바일)
+window.addEventListener('orientationchange', () => {
+    setTimeout(resizeCanvas, 100);
+});
+
 // 이미지 로드
 const batImg1 = new Image(); // 날개 펴기
 const batImg2 = new Image(); // 날개 접기
@@ -78,15 +117,15 @@ let countdown = 0;
 let countdownTimer = 0;
 let debugMode = false; // 디버그 모드 (충돌 영역 표시)
 
-// 박쥐
+// 박쥐 (300px 원본 기준으로 크기 조정)
 const bat = {
-    x: 150,
-    y: 300,
-    width: 40,
-    height: 30,
+    x: 300,
+    y: 600,
+    width: 120, // 300px 원본의 40% 크기
+    height: 90, // 비례 조정
     velocity: 0,
-    gravity: 0.5,
-    jump: -8,
+    gravity: 1.0, // 고해상도에 맞게 조정
+    jump: -16, // 고해상도에 맞게 조정
     // 애니메이션 관련
     animationFrame: 0,
     animationTimer: 0,
@@ -99,10 +138,10 @@ const bat = {
     deathRotationSpeed: 0
 };
 
-// 바위 (장애물)
+// 바위 (장애물) - 고해상도에 맞게 크기 조정
 const rocks = [];
-const rockWidth = 80;
-const rockGap = 180;
+const rockWidth = 160; // 2배 크기
+const rockGap = 360; // 2배 크기
 let rockTimer = 0;
 let caveOffset = 0;
 
@@ -153,8 +192,8 @@ function update() {
         bat.deathRotation += bat.deathRotationSpeed;
         
         // 바닥에 닿으면 정지
-        if (bat.y + bat.height >= canvas.height - 30) {
-            bat.y = canvas.height - 30 - bat.height;
+        if (bat.y + bat.height >= canvasHeight - 60) {
+            bat.y = canvasHeight - 60 - bat.height;
             bat.velocity = 0;
             bat.deathRotationSpeed *= 0.8; // 회전 감속
         }
@@ -164,16 +203,16 @@ function update() {
     if (!gameOver) {
         rockTimer++;
         if (rockTimer > 90) {
-            const gapY = Math.random() * (canvas.height - rockGap - 100) + 50;
+            const gapY = Math.random() * (canvasHeight - rockGap - 200) + 100;
 
             // 위쪽 바위 조각들 생성
             const topPieces = [];
-            for (let y = 0; y < gapY; y += 45) {
+            for (let y = 0; y < gapY; y += 90) { // 2배 크기
                 topPieces.push({
                     x: 0,
                     y: y,
                     width: rockWidth,
-                    height: Math.min(50, gapY - y),
+                    height: Math.min(100, gapY - y), // 2배 크기
                     velocityX: 0,
                     velocityY: 0,
                     rotation: 0,
@@ -184,12 +223,12 @@ function update() {
 
             // 아래쪽 바위 조각들 생성
             const bottomPieces = [];
-            for (let y = gapY + rockGap; y < canvas.height - 30; y += 45) {
+            for (let y = gapY + rockGap; y < canvasHeight - 60; y += 90) { // 2배 크기
                 bottomPieces.push({
                     x: 0,
                     y: y,
                     width: rockWidth,
-                    height: Math.min(50, canvas.height - 30 - y),
+                    height: Math.min(100, canvasHeight - 60 - y), // 2배 크기
                     velocityX: 0,
                     velocityY: 0,
                     rotation: 0,
@@ -199,7 +238,7 @@ function update() {
             }
 
             rocks.push({
-                x: canvas.width,
+                x: canvasWidth,
                 topHeight: gapY,
                 bottomY: gapY + rockGap,
                 passed: false,
@@ -219,7 +258,7 @@ function update() {
 
         // 바위 이동 (게임 오버가 아닐 때만)
         if (!gameOver) {
-            rock.x -= 3;
+            rock.x -= 6; // 고해상도에 맞게 2배 속도
         }
 
         // 바위 조각들 물리 효과 업데이트 (항상 실행)
@@ -232,8 +271,8 @@ function update() {
                     piece.rotation += piece.rotationSpeed;
 
                     // 바닥 충돌 검사 (동굴 바닥)
-                    if (piece.y + piece.height >= canvas.height - 30) {
-                        piece.y = canvas.height - 30 - piece.height;
+                    if (piece.y + piece.height >= canvasHeight - 60) {
+                        piece.y = canvasHeight - 60 - piece.height;
                         piece.velocityY = 0;
                         piece.velocityX *= 0.7; // 마찰
                         piece.rotationSpeed *= 0.8;
@@ -252,8 +291,8 @@ function update() {
                     piece.rotation += piece.rotationSpeed;
 
                     // 바닥 충돌 검사 (동굴 바닥)
-                    if (piece.y + piece.height >= canvas.height - 30) {
-                        piece.y = canvas.height - 30 - piece.height;
+                    if (piece.y + piece.height >= canvasHeight - 60) {
+                        piece.y = canvasHeight - 60 - piece.height;
                         piece.velocityY = 0;
                         piece.velocityX *= 0.7; // 마찰
                         piece.rotationSpeed *= 0.8;
@@ -277,12 +316,12 @@ function update() {
 
     // 동굴 스크롤 (게임 오버가 아닐 때만)
     if (!gameOver) {
-        caveOffset -= 3;
-        if (caveOffset <= -45) caveOffset = 0;
+        caveOffset -= 6; // 고해상도에 맞게 2배 속도
+        if (caveOffset <= -90) caveOffset = 0; // 2배 크기
     }
 
     // 충돌 검사 (동굴 천장과 바닥)
-    if (bat.y <= 30 || bat.y + bat.height >= canvas.height - 30) {
+    if (bat.y <= 60 || bat.y + bat.height >= canvasHeight - 60) {
         if (!gameOver) {
             playRandomHurtSound(); // 벽 충돌 소리 재생
             playRandomExplosionSound(); // 폭발 소리 재생
@@ -298,8 +337,8 @@ function update() {
         if (bat.x < rock.x + rockWidth - rockMargin && bat.x + bat.width > rock.x + rockMargin) {
             // 실제 바위가 그려지는 끝점까지 충돌 검사 (렌더링과 동일한 로직)
             let actualTopEnd = 0;
-            for (let y = 0; y < rock.topHeight; y += 45) {
-                actualTopEnd = y + Math.min(50, rock.topHeight - y);
+            for (let y = 0; y < rock.topHeight; y += 90) { // 2배 크기
+                actualTopEnd = y + Math.min(100, rock.topHeight - y); // 2배 크기
             }
 
             // 위쪽 바위와 충돌 (바위 조각들 떨어뜨리기)
@@ -391,33 +430,39 @@ function getCurrentBatImage() {
 function draw() {
     // 배경
     ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
     // 이미지 로딩 확인
     if (imagesLoaded < totalImages) {
         ctx.fillStyle = '#fff';
-        ctx.font = '24px Arial';
+        ctx.font = '48px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('Loading...', canvas.width/2, canvas.height/2);
-        ctx.fillText(`${imagesLoaded}/${totalImages} images loaded`, canvas.width/2, canvas.height/2 + 40);
+        ctx.fillText('Loading...', canvasWidth/2, canvasHeight/2);
+        ctx.fillText(`${imagesLoaded}/${totalImages} images loaded`, canvasWidth/2, canvasHeight/2 + 80);
         return;
     }
 
     if (!gameStarted) {
-        ctx.drawImage(logoImg, canvas.width/2 - 150, canvas.height/2 - 120, 300, 240);
+        ctx.drawImage(logoImg, canvasWidth/2 - 300, canvasHeight/2 - 240, 600, 480);
         ctx.fillStyle = '#fff';
-        ctx.font = '24px Arial';
+        ctx.font = '48px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('Press SPACE to start', canvas.width/2, canvas.height/2 + 150);
+        
+        // 입력 방법에 따른 안내 메시지
+        if ('ontouchstart' in window) {
+            ctx.fillText('Touch to start', canvasWidth/2, canvasHeight/2 + 300);
+        } else {
+            ctx.fillText('Press SPACE or Click to start', canvasWidth/2, canvasHeight/2 + 300);
+        }
         return;
     }
 
     // 카운트다운 표시
     if (countdown > 0) {
         ctx.fillStyle = '#fff';
-        ctx.font = '48px Arial';
+        ctx.font = '96px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(countdown, canvas.width/2, canvas.height/2);
+        ctx.fillText(countdown, canvasWidth/2, canvasHeight/2);
         return;
     }
 
@@ -434,8 +479,8 @@ function draw() {
             });
         } else {
             // 정상 상태 렌더링
-            for (let y = 0; y < rock.topHeight; y += 45) {
-                ctx.drawImage(rockImg, rock.x, y, rockWidth, Math.min(50, rock.topHeight - y));
+            for (let y = 0; y < rock.topHeight; y += 90) { // 2배 크기
+                ctx.drawImage(rockImg, rock.x, y, rockWidth, Math.min(100, rock.topHeight - y)); // 2배 크기
             }
         }
 
@@ -450,8 +495,8 @@ function draw() {
             });
         } else {
             // 정상 상태 렌더링
-            for (let y = rock.bottomY; y < canvas.height - 30; y += 45) {
-                ctx.drawImage(rockImg, rock.x, y, rockWidth, Math.min(50, canvas.height - 30 - y));
+            for (let y = rock.bottomY; y < canvasHeight - 60; y += 90) { // 2배 크기
+                ctx.drawImage(rockImg, rock.x, y, rockWidth, Math.min(100, canvasHeight - 60 - y)); // 2배 크기
             }
         }
 
@@ -462,12 +507,12 @@ function draw() {
             ctx.lineWidth = 2;
             // Top rock collision area - 실제 바위가 그려지는 끝점까지 계산 (렌더링과 동일한 로직)
             let actualTopEnd = 0;
-            for (let y = 0; y < rock.topHeight; y += 45) {
-                actualTopEnd = y + Math.min(50, rock.topHeight - y);
+            for (let y = 0; y < rock.topHeight; y += 90) { // 2배 크기
+                actualTopEnd = y + Math.min(100, rock.topHeight - y); // 2배 크기
             }
             ctx.strokeRect(rock.x + rockMargin, 0, rockWidth - rockMargin * 2, actualTopEnd - rockMargin);
             // Bottom rock collision area
-            ctx.strokeRect(rock.x + rockMargin, rock.bottomY + rockMargin, rockWidth - rockMargin * 2, canvas.height - (rock.bottomY + rockMargin));
+            ctx.strokeRect(rock.x + rockMargin, rock.bottomY + rockMargin, rockWidth - rockMargin * 2, canvasHeight - (rock.bottomY + rockMargin));
         }
     }
 
@@ -494,85 +539,131 @@ function draw() {
     }
 
     // Cave ceiling and floor (가장 앞에 렌더링)
-    for (let x = caveOffset; x < canvas.width + 50; x += 45) {
-        ctx.drawImage(rockImg, x, 0, 50, 30); // Top ceiling
-        ctx.drawImage(rockImg, x, canvas.height - 30, 50, 30); // Bottom floor
+    for (let x = caveOffset; x < canvasWidth + 100; x += 90) { // 2배 크기
+        ctx.drawImage(rockImg, x, 0, 100, 60); // Top ceiling (2배 크기)
+        ctx.drawImage(rockImg, x, canvasHeight - 60, 100, 60); // Bottom floor (2배 크기)
     }
 
     // 동굴 벽 충돌 영역 표시 (디버그 모드)
     if (debugMode) {
         ctx.strokeStyle = 'yellow';
         ctx.lineWidth = 2;
-        ctx.strokeRect(0, 0, canvas.width, 30); // Top ceiling collision
-        ctx.strokeRect(0, canvas.height - 30, canvas.width, 30); // Bottom floor collision
+        ctx.strokeRect(0, 0, canvasWidth, 60); // Top ceiling collision
+        ctx.strokeRect(0, canvasHeight - 60, canvasWidth, 60); // Bottom floor collision
     }
 
     // 점수 표시
     if (gameStarted) {
         ctx.fillStyle = '#fff';
-        ctx.font = '20px Arial';
+        ctx.font = '40px Arial';
         ctx.textAlign = 'left';
-        ctx.fillText('Score: ' + score, 20, 40);
+        ctx.fillText('Score: ' + score, 40, 80);
     }
 
     if (gameOver) {
         ctx.fillStyle = '#fff';
-        ctx.font = '24px Arial';
+        ctx.font = '48px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('Game Over!', canvas.width/2, canvas.height/2);
-        ctx.fillText('Score: ' + score, canvas.width/2, canvas.height/2 + 30);
-        ctx.fillText('Press R to restart', canvas.width/2, canvas.height/2 + 60);
+        ctx.fillText('Game Over!', canvasWidth/2, canvasHeight/2);
+        ctx.fillText('Score: ' + score, canvasWidth/2, canvasHeight/2 + 60);
+        
+        // 입력 방법에 따른 재시작 안내
+        if ('ontouchstart' in window) {
+            ctx.fillText('Touch to restart', canvasWidth/2, canvasHeight/2 + 120);
+        } else {
+            ctx.fillText('Press R or Click to restart', canvasWidth/2, canvasHeight/2 + 120);
+        }
+    }
+}
+
+// 게임 입력 처리 함수
+function handleGameInput(e) {
+    if (e) e.preventDefault();
+    
+    if (!gameStarted && imagesLoaded >= totalImages) {
+        gameStarted = true;
+        countdown = 3;
+        countdownTimer = 0;
+    } else if (!gameOver && countdown === 0) {
+        bat.velocity = bat.jump;
+        // 날개짓 애니메이션 시작 (연속 입력시 더 빠르게)
+        if (!bat.isFlapping) {
+            bat.isFlapping = true;
+            bat.flapDuration = 12; // 조금 더 빠르게
+            bat.flapPhase = 0;
+        } else {
+            // 이미 날개짓 중이면 더 빠른 날개짓
+            bat.flapDuration = Math.max(bat.flapDuration, 8);
+            bat.flapPhase = 0; // 다시 펼치기부터 시작
+        }
+        // 날개짓 소리 재생
+        sounds.takeoff.currentTime = 0; // 소리 리셋
+        sounds.takeoff.play().catch(e => console.log('Audio play failed:', e));
+    }
+}
+
+function handleRestart(e) {
+    if (e) e.preventDefault();
+    
+    if (gameOver) {
+        // 재시작
+        gameOver = false;
+        gameStarted = true;
+        countdown = 3;
+        countdownTimer = 0;
+        bat.y = 600;
+        bat.velocity = 0;
+        bat.animationFrame = 0;
+        bat.animationTimer = 0;
+        bat.isFlapping = false;
+        bat.flapDuration = 0;
+        bat.flapPhase = 0;
+        bat.isDead = false;
+        bat.deathRotation = 0;
+        bat.deathRotationSpeed = 0;
+        rocks.length = 0;
+        rockTimer = 0;
+        score = 0;
+        caveOffset = 0;
     }
 }
 
 // 키보드 입력
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
-        e.preventDefault();
-        if (!gameStarted && imagesLoaded >= totalImages) {
-            gameStarted = true;
-            countdown = 3;
-            countdownTimer = 0;
-        } else if (!gameOver && countdown === 0) {
-            bat.velocity = bat.jump;
-            // 날개짓 애니메이션 시작 (연속 입력시 더 빠르게)
-            if (!bat.isFlapping) {
-                bat.isFlapping = true;
-                bat.flapDuration = 12; // 조금 더 빠르게
-                bat.flapPhase = 0;
-            } else {
-                // 이미 날개짓 중이면 더 빠른 날개짓
-                bat.flapDuration = Math.max(bat.flapDuration, 8);
-                bat.flapPhase = 0; // 다시 펼치기부터 시작
-            }
-            // 날개짓 소리 재생
-            sounds.takeoff.currentTime = 0; // 소리 리셋
-            sounds.takeoff.play().catch(e => console.log('Audio play failed:', e));
-        }
+        handleGameInput(e);
     } else if (e.code === 'KeyR') {
-        e.preventDefault();
-        if (gameOver) {
-            // 재시작
-            gameOver = false;
-            gameStarted = true;
-            countdown = 3;
-            countdownTimer = 0;
-            bat.y = 300;
-            bat.velocity = 0;
-            bat.animationFrame = 0;
-            bat.animationTimer = 0;
-            bat.isFlapping = false;
-            bat.flapDuration = 0;
-            bat.flapPhase = 0;
-            bat.isDead = false;
-            bat.deathRotation = 0;
-            bat.deathRotationSpeed = 0;
-            rocks.length = 0;
-            rockTimer = 0;
-            score = 0;
-            caveOffset = 0;
-        }
+        handleRestart(e);
     }
 });
+
+// 터치 입력 지원
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (gameOver) {
+        handleRestart(e);
+    } else {
+        handleGameInput(e);
+    }
+});
+
+canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+});
+
+// 마우스 클릭 지원
+canvas.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    if (gameOver) {
+        handleRestart(e);
+    } else {
+        handleGameInput(e);
+    }
+});
+
+// 터치 스크롤 방지
+document.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+}, { passive: false });
 
 gameLoop();
