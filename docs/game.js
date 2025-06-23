@@ -107,8 +107,9 @@ function update() {
     }
 
     for (const rock of rocks) {
-        if (bat.x < rock.x + rockWidth && bat.x + bat.width > rock.x) {
-            if (bat.y < rock.topHeight || bat.y + bat.height > rock.bottomY) {
+        const rockMargin = rockWidth * 0.025;
+        if (bat.x < rock.x + rockWidth - rockMargin && bat.x + bat.width > rock.x + rockMargin) {
+            if (bat.y < rock.topHeight - rockMargin || bat.y + bat.height > rock.bottomY + rockMargin) {
                 gameOver = true;
             }
         }
