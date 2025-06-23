@@ -2,10 +2,12 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 // 이미지 로드
-const batImg = new Image();
+const batImg1 = new Image(); // 날개 펴기
+const batImg2 = new Image(); // 날개 접기
 const rockImg = new Image();
 const logoImg = new Image();
-batImg.src = 'images/bat.png';
+batImg1.src = 'images/bat1.png';
+batImg2.src = 'images/bat2.png';
 rockImg.src = 'images/rock.png';
 logoImg.src = 'images/game.png';
 
@@ -59,7 +61,8 @@ let imagesLoaded = 0;
 function imageLoaded() {
     imagesLoaded++;
 }
-batImg.onload = imageLoaded;
+batImg1.onload = imageLoaded;
+batImg2.onload = imageLoaded;
 rockImg.onload = imageLoaded;
 logoImg.onload = imageLoaded;
 
@@ -79,7 +82,13 @@ const bat = {
     height: 30,
     velocity: 0,
     gravity: 0.5,
-    jump: -8
+    jump: -8,
+    // 애니메이션 관련
+    animationFrame: 0,
+    animationTimer: 0,
+    isFlapping: false,
+    flapDuration: 0,
+    flapPhase: 0 // 0: 펼치기, 1: 접기
 };
 
 // 바위 (장애물)
@@ -124,6 +133,9 @@ function update() {
     if (!gameOver) {
         bat.velocity += bat.gravity;
         bat.y += bat.velocity;
+        
+        // 박쥐 애니메이션 업데이트
+        updateBatAnimation();
     }
 
     // 바위 생성 (게임 오버가 아닐 때만)
@@ -297,6 +309,49 @@ function update() {
     }
 }
 
+// 박쥐 애니메이션 업데이트 함수
+function updateBatAnimation() {
+    // 날개짓 애니메이션 타이머 업데이트
+    if (bat.isFlapping) {
+        bat.flapDuration--;
+        
+        // 날개짓 단계 변경 (펼치기 -> 접기)
+        if (bat.flapDuration <= 4 && bat.flapPhase === 0) { // 마지막 4프레임에서 접기
+            bat.flapPhase = 1;
+        }
+        
+        if (bat.flapDuration <= 0) {
+            bat.isFlapping = false;
+            bat.flapPhase = 0;
+        }
+    }
+    
+    // 일반 애니메이션 타이머 (자연스러운 날개짓)
+    if (!bat.isFlapping) {
+        bat.animationTimer++;
+        if (bat.animationTimer >= 20) { // 약 1/3초마다 변경
+            bat.animationFrame = (bat.animationFrame + 1) % 2;
+            bat.animationTimer = 0;
+        }
+    }
+}
+
+// 현재 박쥐 이미지 반환 함수
+function getCurrentBatImage() {
+    // 점프 애니메이션 중일 때
+    if (bat.isFlapping) {
+        return bat.flapPhase === 0 ? batImg1 : batImg2; // 0: 펼치기, 1: 접기
+    }
+    
+    // 떨어질 때(하강 중)는 날개 펴기 (bat1)
+    if (bat.velocity > 2) {
+        return batImg1;
+    }
+    
+    // 일반 상태에서는 애니메이션 프레임에 따라 (자연스러운 날개짓)
+    return bat.animationFrame === 0 ? batImg2 : batImg1;
+}
+
 function draw() {
     // 배경
     ctx.fillStyle = '#000';
@@ -371,7 +426,8 @@ function draw() {
     }
 
     // 박쥐
-    ctx.drawImage(batImg, bat.x, bat.y, bat.width, bat.height);
+    const currentBatImg = getCurrentBatImage();
+    ctx.drawImage(currentBatImg, bat.x, bat.y, bat.width, bat.height);
 
     // 박쥐 충돌 영역 표시 (디버그 모드)
     if (debugMode) {
@@ -422,6 +478,16 @@ document.addEventListener('keydown', (e) => {
             countdownTimer = 0;
         } else if (!gameOver && countdown === 0) {
             bat.velocity = bat.jump;
+            // 날개짓 애니메이션 시작 (연속 입력시 더 빠르게)
+            if (!bat.isFlapping) {
+                bat.isFlapping = true;
+                bat.flapDuration = 12; // 조금 더 빠르게
+                bat.flapPhase = 0;
+            } else {
+                // 이미 날개짓 중이면 더 빠른 날개짓
+                bat.flapDuration = Math.max(bat.flapDuration, 8);
+                bat.flapPhase = 0; // 다시 펼치기부터 시작
+            }
             // 날개짓 소리 재생
             sounds.takeoff.currentTime = 0; // 소리 리셋
             sounds.takeoff.play().catch(e => console.log('Audio play failed:', e));
@@ -436,6 +502,11 @@ document.addEventListener('keydown', (e) => {
             countdownTimer = 0;
             bat.y = 300;
             bat.velocity = 0;
+            bat.animationFrame = 0;
+            bat.animationTimer = 0;
+            bat.isFlapping = false;
+            bat.flapDuration = 0;
+            bat.flapPhase = 0;
             rocks.length = 0;
             rockTimer = 0;
             score = 0;
