@@ -24,16 +24,19 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 3. **Avoid Obstacles**: Navigate through gaps between rock pillars
 4. **Score Points**: Each obstacle passed increases your score
 5. **Game Over**: Collision with rocks, ceiling, or floor ends the game
-6. **Restart**: Press SPACEBAR after game over to play again
+6. **Restart**: Press R after game over to play again
 
 ## Game Features
 
+- **Fullscreen Display**: Responsive design that fills the entire browser window
 - **Realistic Physics**: Gravity and momentum-based flight
 - **Scrolling Cave**: Moving rocky ceiling and floor
 - **Random Obstacles**: Procedurally generated rock pillars
 - **Score System**: Track obstacles successfully passed
 - **Visual Graphics**: Custom bat and rock sprites
 - **Smooth Animation**: 60 FPS game loop
+- **Countdown Timer**: 3-second countdown before game starts
+- **Forgiving Collision**: Optimized hitbox for better gameplay experience
 
 ## Game Assets
 
@@ -53,12 +56,15 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 
 ## Game Mechanics
 
-- **Bat Size**: 30x20 pixels
+- **Screen Size**: 800x600 pixels (fullscreen display)
+- **Bat Size**: 40x30 pixels
 - **Jump Force**: -8 velocity units
 - **Gravity**: 0.5 acceleration per frame
 - **Obstacle Speed**: 3 pixels per frame
-- **Gap Size**: 150 pixels between rock pillars
+- **Rock Width**: 80 pixels
+- **Gap Size**: 180 pixels between rock pillars
 - **Spawn Rate**: New obstacle every 90 frames (~1.5 seconds)
+- **Collision Detection**: Bat 100%, Rocks 95% (forgiving hitbox)
 
 ## Development
 
