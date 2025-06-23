@@ -58,6 +58,7 @@ function playRandomExplosionSound() {
 
 // Wait for images to load
 let imagesLoaded = 0;
+const totalImages = 4;
 function imageLoaded() {
     imagesLoaded++;
 }
@@ -259,8 +260,8 @@ function update() {
         if (caveOffset <= -45) caveOffset = 0;
     }
 
-    // 충돌 검사
-    if (bat.y <= 0 || bat.y + bat.height >= canvas.height) {
+    // 충돌 검사 (동굴 천장과 바닥)
+    if (bat.y <= 30 || bat.y + bat.height >= canvas.height - 30) {
         if (!gameOver) {
             playRandomHurtSound(); // 벽 충돌 소리 재생
             playRandomExplosionSound(); // 폭발 소리 재생
@@ -356,6 +357,16 @@ function draw() {
     // 배경
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 이미지 로딩 확인
+    if (imagesLoaded < totalImages) {
+        ctx.fillStyle = '#fff';
+        ctx.font = '24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Loading...', canvas.width/2, canvas.height/2);
+        ctx.fillText(`${imagesLoaded}/${totalImages} images loaded`, canvas.width/2, canvas.height/2 + 40);
+        return;
+    }
 
     if (!gameStarted) {
         ctx.drawImage(logoImg, canvas.width/2 - 150, canvas.height/2 - 120, 300, 240);
@@ -472,7 +483,7 @@ function draw() {
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         e.preventDefault();
-        if (!gameStarted) {
+        if (!gameStarted && imagesLoaded >= totalImages) {
             gameStarted = true;
             countdown = 3;
             countdownTimer = 0;
