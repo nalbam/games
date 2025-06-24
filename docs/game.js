@@ -6,25 +6,33 @@ const dpr = window.devicePixelRatio || 1;
 const canvasWidth = 1600;
 const canvasHeight = 1200;
 
-// 캔버스 반응형 크기 조정 함수
+// 캔버스 반응형 크기 조정 함수 (모바일 최적화)
 function resizeCanvas() {
     const container = document.getElementById('gameContainer');
     const rect = container.getBoundingClientRect();
     
-    // 캔버스 실제 렌더링 크기 (고해상도)
-    canvas.width = canvasWidth * dpr;
-    canvas.height = canvasHeight * dpr;
+    // 모바일 성능을 위한 해상도 조정
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const adjustedDpr = isMobile ? Math.min(dpr, 2) : dpr; // 모바일에서 최대 2배로 제한
+    
+    // 캔버스 실제 렌더링 크기
+    canvas.width = canvasWidth * adjustedDpr;
+    canvas.height = canvasHeight * adjustedDpr;
     
     // CSS 표시 크기는 컨테이너에 맞춤
     canvas.style.width = rect.width + 'px';
     canvas.style.height = rect.height + 'px';
     
     // 컨텍스트 스케일링
-    ctx.scale(dpr, dpr);
+    ctx.scale(adjustedDpr, adjustedDpr);
     
-    // 이미지 스무딩 활성화
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
+    // 모바일 성능 최적화
+    if (isMobile) {
+        ctx.imageSmoothingEnabled = false; // 모바일에서는 스무딩 비활성화
+    } else {
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+    }
 }
 
 // 초기 캔버스 크기 설정
@@ -52,7 +60,7 @@ batImgX.src = 'images/batx.png';
 rockImg.src = 'images/rock.png';
 logoImg.src = 'images/game.png';
 
-// 오디오 로드
+// 오디오 로드 및 모바일 최적화
 const sounds = {
     takeoff: new Audio('sounds/Bat_takeoff.ogg'),
     hurt1: new Audio('sounds/Bat_hurt1.ogg'),
@@ -68,33 +76,58 @@ const sounds = {
     explosion4: new Audio('sounds/Explosion4.ogg')
 };
 
-// 오디오 볼륨 설정
+// 오디오 볼륨 설정 및 모바일 최적화
 Object.values(sounds).forEach(sound => {
     sound.volume = 0.5;
+    sound.preload = 'auto';
+    // iOS Safari용 최적화
+    sound.load();
 });
 
-// 랜덤 충돌 소리 재생 함수
+// 오디오 재생 성능 최적화
+let audioContext = null;
+let lastAudioTime = 0;
+const AUDIO_THROTTLE = 50; // 50ms 간격으로 오디오 재생 제한
+
+function playAudioSafe(audio) {
+    const now = Date.now();
+    if (now - lastAudioTime < AUDIO_THROTTLE) {
+        return; // 너무 빈번한 오디오 재생 방지
+    }
+    lastAudioTime = now;
+    
+    try {
+        audio.currentTime = 0;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(e => {
+                // 오디오 재생 실패 시 무시 (성능 향상)
+            });
+        }
+    } catch (e) {
+        // 오디오 재생 실패 시 무시
+    }
+}
+
+// 랜덤 충돌 소리 재생 함수 (최적화)
 function playRandomHurtSound() {
     const hurtSounds = [sounds.hurt1, sounds.hurt2, sounds.hurt3];
     const randomSound = hurtSounds[Math.floor(Math.random() * hurtSounds.length)];
-    randomSound.currentTime = 0; // 소리 리셋
-    randomSound.play().catch(e => console.log('Audio play failed:', e));
+    playAudioSafe(randomSound);
 }
 
-// 랜덤 idle 소리 재생 함수
+// 랜덤 idle 소리 재생 함수 (최적화)
 function playRandomIdleSound() {
     const idleSounds = [sounds.idle1, sounds.idle2, sounds.idle3, sounds.idle4];
     const randomSound = idleSounds[Math.floor(Math.random() * idleSounds.length)];
-    randomSound.currentTime = 0; // 소리 리셋
-    randomSound.play().catch(e => console.log('Audio play failed:', e));
+    playAudioSafe(randomSound);
 }
 
-// 랜덤 폭발 소리 재생 함수
+// 랜덤 폭발 소리 재생 함수 (최적화)
 function playRandomExplosionSound() {
     const explosionSounds = [sounds.explosion1, sounds.explosion2, sounds.explosion3, sounds.explosion4];
     const randomSound = explosionSounds[Math.floor(Math.random() * explosionSounds.length)];
-    randomSound.currentTime = 0; // 소리 리셋
-    randomSound.play().catch(e => console.log('Audio play failed:', e));
+    playAudioSafe(randomSound);
 }
 
 // Wait for images to load
@@ -633,9 +666,8 @@ function handleGameInput(e) {
             bat.flapDuration = Math.max(bat.flapDuration, 8);
             bat.flapPhase = 0; // 다시 펼치기부터 시작
         }
-        // 날개짓 소리 재생
-        sounds.takeoff.currentTime = 0; // 소리 리셋
-        sounds.takeoff.play().catch(e => console.log('Audio play failed:', e));
+        // 날개짓 소리 재생 (최적화)
+        playAudioSafe(sounds.takeoff);
     }
 }
 
@@ -698,9 +730,24 @@ canvas.addEventListener('mousedown', (e) => {
     }
 });
 
-// 터치 스크롤 방지
+// 터치 스크롤 방지 및 모바일 최적화
 document.addEventListener('touchmove', (e) => {
     e.preventDefault();
 }, { passive: false });
+
+// 모바일 성능 향상을 위한 추가 설정
+if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+    // 모바일에서 불필요한 이벤트 제거
+    document.addEventListener('gesturestart', (e) => e.preventDefault());
+    document.addEventListener('gesturechange', (e) => e.preventDefault());
+    document.addEventListener('gestureend', (e) => e.preventDefault());
+    
+    // iOS Safari 주소창 숨김 처리
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            window.scrollTo(0, 1);
+        }, 100);
+    });
+}
 
 gameLoop();

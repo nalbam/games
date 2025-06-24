@@ -1,7 +1,11 @@
 # Flappy Bat
 
 <div align="center">
-  <img src="./docs/images/game.png" alt="Flappy Bat Logo" width="300">
+  <a href="https://nalbam.github.io/flappy-bat/">
+    <img src="./docs/images/game.png" alt="Flappy Bat Logo" width="300">
+  </a>
+  <br>
+  <a href="https://nalbam.github.io/flappy-bat/">🎮 Play Game</a>
 </div>
 
 A simple flappy bat game built with HTML5 Canvas and JavaScript.
@@ -19,12 +23,26 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 
 ## How to Play
 
-1. **Start Game**: Press SPACEBAR to begin
-2. **Control Bat**: Press SPACEBAR to flap wings and fly up
-3. **Avoid Obstacles**: Navigate through gaps between rock pillars
+### 🎮 Controls
+- **Desktop**: SPACEBAR or Click to flap wings
+- **Mobile**: Touch screen to flap wings
+- **Restart**: Press R key or Click/Touch after game over
+
+### 🎯 Gameplay
+1. **Start Game**: Press SPACEBAR, Click, or Touch to begin
+2. **Control Bat**: 
+   - Press SPACEBAR, Click, or Touch to flap wings and fly up
+   - Release to let gravity pull the bat down
+3. **Navigate Obstacles**: Fly through gaps between rock pillars
 4. **Score Points**: Each obstacle passed increases your score
 5. **Game Over**: Collision with rocks, ceiling, or floor ends the game
-6. **Restart**: Press R after game over to play again
+6. **Restart**: Use R key, Click, or Touch to play again
+
+### 📱 Mobile Optimized
+- Responsive design works on all devices
+- Touch controls for smartphones and tablets
+- Optimized performance for iOS and Android
+- Full-screen gameplay experience
 
 ## Game Features
 
@@ -66,9 +84,14 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 
 ## How to Run
 
-1. Open `docs/index.html` in a web browser
-2. Press SPACEBAR to start playing
-3. Enjoy the game!
+### 🌐 Play Online
+Visit: **https://nalbam.github.io/flappy-bat/**
+
+### 💻 Run Locally
+1. Clone this repository
+2. Open `docs/index.html` in a web browser
+3. Press SPACEBAR, Click, or Touch to start playing
+4. Enjoy the game!
 
 ## Game Mechanics
 
@@ -141,9 +164,13 @@ This game was developed using **Claude Code**, an AI-powered coding assistant th
 - Responsive canvas scaling
 
 ### Recent Updates
-- **Bat Animation System**: Added dynamic wing animations with bat1.png and bat2.png sprites
+- **Cross-Platform Performance**: 60 FPS frame rate consistency across all devices
+- **Mobile Optimization**: Enhanced performance for iOS and Android devices
+- **Audio System**: Optimized sound effects with performance throttling
+- **Bat Image Scaling**: Accurate proportions for all bat sprites (bat1, bat2, batx)
+- **Touch Controls**: Full touch support for mobile devices
+- **Bat Animation System**: Dynamic wing animations with proper aspect ratios
 - **Movement-Based Animation**: Wings respond to jump, fall, and idle states
-- **Rapid Input Handling**: Faster wing flapping for consecutive key presses
-- **Cave Collision Fix**: Accurate collision detection for 30px cave boundaries
+- **Rapid Input Handling**: Faster wing flapping for consecutive inputs
+- **Cave Collision Fix**: Accurate collision detection for cave boundaries
 - **Safe Asset Loading**: Loading screen prevents game start until all images are ready
-- **Animation Timing**: Optimized wing animation cycles for natural movement
