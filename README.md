@@ -14,12 +14,14 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 
 ## Game Overview
 
-- **Genre**: Side-scrolling 2D Arcade
-- **Character**: Bat
-- **Controls**: SPACEBAR → Flap wings (fly up)
-- **Physics**: Automatic gravity (fall down)
-- **Obstacles**: Rock pillars with gaps
-- **Environment**: Moving rocky cave
+- **Genre**: Side-scrolling 2D Arcade with Power-ups
+- **Character**: Bat with multiple forms (Normal, Fever, Dead)
+- **Controls**: SPACEBAR/Click/Touch → Flap wings (fly up)
+- **Physics**: Realistic gravity and momentum-based flight
+- **Obstacles**: Destructible rock pillars with physics
+- **Environment**: Moving rocky cave with dynamic effects
+- **Special Features**: Fever Mode with torch collection system
+- **Performance**: 60 FPS locked across all platforms
 
 ## How to Play
 
@@ -33,10 +35,17 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 2. **Control Bat**: 
    - Press SPACEBAR, Click, or Touch to flap wings and fly up
    - Release to let gravity pull the bat down
-3. **Navigate Obstacles**: Fly through gaps between rock pillars
-4. **Score Points**: Each obstacle passed increases your score
-5. **Game Over**: Collision with rocks, ceiling, or floor ends the game
-6. **Restart**: Use R key, Click, or Touch to play again
+3. **Navigate Obstacles**: Fly through gaps between destructible rock pillars
+4. **Collect Torches**: Every 10 obstacles passed spawns a torch at random location
+5. **Activate Fever Mode**: Touch a torch to become a giant, invincible bat
+6. **Fever Mode Powers**: 
+   - 2x larger size (giant bat)
+   - 4x faster speed (ultra-fast movement)
+   - Invincible to rock collisions (destroy rocks instead)
+   - 5-second duration with timer bar
+7. **Score Points**: Each obstacle passed increases your score
+8. **Game Over**: Collision with rocks, ceiling, or floor ends the game (except in Fever Mode)
+9. **Restart**: Use R key or click Restart button to play again
 
 ### 📱 Mobile Optimized
 - Responsive design works on all devices
@@ -46,36 +55,56 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 
 ## Game Features
 
+### 🎮 Core Gameplay
 - **Fullscreen Display**: Responsive design that fills the entire browser window
-- **Realistic Physics**: Gravity and momentum-based flight with destructible rocks
-- **Scrolling Cave**: Moving rocky ceiling and floor
-- **Random Obstacles**: Procedurally generated rock pillars
-- **Score System**: Track obstacles successfully passed
-- **Visual Graphics**: Custom bat and rock sprites with smooth animations
-- **Bat Animation System**: Dynamic wing animation based on movement
-- **Smooth Animation**: 60 FPS game loop
-- **Countdown Timer**: 3-second countdown before game starts
-- **Asset Loading**: Safe image loading with loading screen
-- **Dynamic Rock Physics**: Rocks break into individual pieces when hit
-- **Realistic Destruction**: Rock pieces fall with gravity and bounce realistically
-- **Sound Effects**: Immersive audio including wing flaps, collisions, and explosions
+- **Cross-Platform Performance**: 60 FPS locked on Windows, Mac, iOS, and Android
+- **Advanced Physics**: Gravity, momentum, and realistic object destruction
+- **Multiple Bat Forms**: Normal (2 animations), Fever (giant), and Death states
+- **Progressive Difficulty**: Obstacles become more challenging over time
+
+### 🔥 Fever Mode System
+- **Torch Collection**: Spawns every 10 obstacles at random locations
+- **Giant Bat Transformation**: 2x size increase with fever sprite
+- **Super Speed**: 4x movement speed (24 vs 6 pixels/frame)
+- **Invincibility**: Destroy rocks instead of dying on collision
+- **Visual Feedback**: "FEVER MODE!" text and countdown timer bar
+- **Duration**: 5-second power-up with real-time timer
+
+### 🎨 Visual & Audio
+- **Dynamic Animations**: Wing flapping responds to movement and input
+- **Destructible Environment**: Rocks break into physics-based pieces
+- **Realistic Destruction**: Rock pieces fall, bounce, and settle naturally
+- **Immersive Audio**: Wing flaps, collisions, explosions, and power-up sounds
+- **Visual Effects**: Glowing torch effects and fever mode indicators
+- **Responsive UI**: Restart button, score display, and fever mode status
+
+### 🛠️ Technical Features
+- **Asset Loading**: Safe image loading with progress indicator
 - **Debug Mode**: Visual collision area display (disabled by default)
-- **Precise Collision**: Accurate collision detection matching visual rock boundaries
+- **Precise Collision**: Accurate detection matching visual boundaries
+- **Mobile Optimization**: Performance tuning for iOS and Android
+- **Audio Throttling**: Performance-optimized sound system
+- **Memory Management**: Efficient object pooling and cleanup
 
 ## Game Assets
 
 ### Images
 - **Bat Animation Sprites**: 
-  - [bat1.png](./docs/images/bat1.png) - Wings spread (gliding/falling)
-  - [bat2.png](./docs/images/bat2.png) - Wings folded (jumping/flapping)
-- **Rock Texture**: [rock.png](./docs/images/rock.png)
-- **Game Logo**: [game.png](./docs/images/game.png)
+  - [bat1.png](./docs/images/bat1.png) - Wings spread (300x223) - Gliding/falling
+  - [bat2.png](./docs/images/bat2.png) - Wings folded (300x223) - Jumping/flapping
+  - [bat_dead.png](./docs/images/bat_dead.png) - Dead state (300x317) - Game over
+  - [bat_fever.png](./docs/images/bat_fever.png) - Fever mode (400x353) - Power-up state
+- **Power-up Items**:
+  - [torch.png](./docs/images/torch.png) - Fever mode trigger (170x300)
+- **Environment**:
+  - [rock.png](./docs/images/rock.png) - Destructible rock texture
+  - [game.png](./docs/images/game.png) - Game logo
 
 ### Sound Effects
-- **Wing Flap**: [Bat_takeoff.ogg](./docs/sounds/Bat_takeoff.ogg)
-- **Idle Sounds**: Bat_idle1-4.ogg (4 variations)
-- **Pain Sounds**: Bat_hurt1-3.ogg (3 variations)
-- **Explosion Effects**: Explosion1-4.ogg (4 variations)
+- **Wing Flap**: [Bat_takeoff.ogg](./docs/sounds/Bat_takeoff.ogg) - Jump/flap sound
+- **Power-up Sounds**: Bat_idle1-4.ogg (4 variations) - Torch collection & game start
+- **Collision Sounds**: Bat_hurt1-3.ogg (3 variations) - Rock collision damage
+- **Destruction Effects**: Explosion1-4.ogg (4 variations) - Rock breaking sounds
 
 ## Source Code
 
@@ -96,36 +125,59 @@ Visit: **https://nalbam.github.io/flappy-bat/**
 ## Game Mechanics
 
 ### Basic Physics
-- **Screen Size**: 800x600 pixels (fullscreen display)
-- **Bat Size**: 40x30 pixels
-- **Jump Force**: -8 velocity units
-- **Gravity**: 0.5 acceleration per frame (bat), 0.3 (rock pieces)
-- **Obstacle Speed**: 3 pixels per frame
-- **Rock Width**: 80 pixels
-- **Gap Size**: 180 pixels between rock pillars
-- **Spawn Rate**: New obstacle every 90 frames (~1.5 seconds)
-- **Cave Boundaries**: 30px ceiling and floor collision zones
+- **Screen Size**: 1600x1200 pixels (high-resolution, fullscreen display)
+- **Bat Sizes**: 
+  - Normal: 121x90 pixels (bat1/bat2)
+  - Dead: 85x90 pixels (bat_dead)
+  - Fever: 204x180 pixels (bat_fever - 2x larger)
+- **Jump Force**: -16 velocity units
+- **Gravity**: 1.0 acceleration per frame (bat), 0.3 (rock pieces)
+- **Movement Speeds**: 
+  - Normal: 6 pixels per frame
+  - Fever Mode: 24 pixels per frame (4x faster)
+- **Rock Specifications**: 
+  - Width: 160 pixels
+  - Gap: 360 pixels between rock pillars
+  - Spawn Rate: Every 90 frames (~1.5 seconds at 60 FPS)
+- **Cave Boundaries**: 60px ceiling and floor collision zones
+
+### Fever Mode Mechanics
+- **Activation**: Collect torch (spawns every 10 obstacles)
+- **Torch Size**: 51x90 pixels (170x300 source ratio)
+- **Duration**: 300 frames (5 seconds at 60 FPS)
+- **Effects**: Giant size, 4x speed, invincibility to rocks
+- **Visual Timer**: Real-time countdown bar display
 
 ### Animation System
-- **Jump Animation**: Wings spread (bat1) → Wings folded (bat2)
-- **Falling Animation**: Wings spread for gliding
-- **Idle Animation**: Natural wing flapping cycle (20 frames)
-- **Rapid Input**: Faster wing animation on consecutive jumps
-- **Animation Timing**: 12 frames (normal), 8 frames (rapid)
+- **Normal Mode Animations**:
+  - Jump: Wings spread (bat1) → Wings folded (bat2)
+  - Falling: Wings spread for gliding
+  - Idle: Natural wing flapping cycle (20 frames)
+  - Rapid Input: Faster wing animation on consecutive jumps
+  - Timing: 12 frames (normal), 8 frames (rapid)
+- **Fever Mode**: Giant bat_fever sprite with enhanced visual effects
+- **Death Animation**: bat_dead sprite with rotation effects
 
 ### Collision & Destruction
 - **Collision Detection**: Precise collision matching visual boundaries
-- **Rock Destruction**: Individual 45-pixel rock pieces with physics
-- **Top Rock Behavior**: Falls and scatters on collision
-- **Bottom Rock Behavior**: Tips over in collision direction
-- **Ground Contact**: Rock pieces settle on cave floor (30px from bottom)
-- **Friction**: 0.7 coefficient when pieces hit ground
+- **Rock Destruction**: Individual 90-pixel rock pieces with realistic physics
+- **Normal Mode**: Collision with rocks causes game over + rock destruction
+- **Fever Mode**: Collision destroys rocks but bat continues (invincible)
+- **Rock Physics**: 
+  - Top rocks: Fall and scatter on collision
+  - Bottom rocks: Tip over in collision direction
+  - Ground settling: Pieces settle on cave floor (60px from bottom)
+  - Friction: 0.7 coefficient when pieces hit ground
+  - Rotation: Individual piece rotation with momentum
 
 ### Audio System
-- **Wing Flap**: Plays on every SPACEBAR press
+- **Wing Flap**: Plays on every jump input (SPACEBAR/Click/Touch)
 - **Game Start**: Random idle sound after countdown
-- **Collision**: Simultaneous hurt + explosion sounds
-- **Volume**: All sounds at 50% volume
+- **Normal Collision**: Simultaneous hurt + explosion sounds (game over)
+- **Fever Collision**: Explosion sound only (no hurt sound, continues playing)
+- **Torch Collection**: Random idle sound for power-up feedback
+- **Performance**: 50ms throttling to prevent audio overlap on mobile
+- **Volume**: All sounds at 50% with mobile optimization
 
 ## Development
 
@@ -164,13 +216,33 @@ This game was developed using **Claude Code**, an AI-powered coding assistant th
 - Responsive canvas scaling
 
 ### Recent Updates
-- **Cross-Platform Performance**: 60 FPS frame rate consistency across all devices
-- **Mobile Optimization**: Enhanced performance for iOS and Android devices
-- **Audio System**: Optimized sound effects with performance throttling
-- **Bat Image Scaling**: Accurate proportions for all bat sprites (bat1, bat2, batx)
-- **Touch Controls**: Full touch support for mobile devices
-- **Bat Animation System**: Dynamic wing animations with proper aspect ratios
-- **Movement-Based Animation**: Wings respond to jump, fall, and idle states
-- **Rapid Input Handling**: Faster wing flapping for consecutive inputs
-- **Cave Collision Fix**: Accurate collision detection for cave boundaries
-- **Safe Asset Loading**: Loading screen prevents game start until all images are ready
+
+#### Version 2.0 - Fever Mode Update
+- **🔥 Fever Mode System**: Complete power-up system with torch collection
+  - Giant bat transformation (2x size, 4x speed)
+  - Invincibility to rock collisions with destruction effects
+  - Visual timer bar and "FEVER MODE!" display
+  - 5-second duration with real-time countdown
+- **🎨 New Visual Assets**: 
+  - bat_fever.png (400x353) - Giant fever mode sprite
+  - bat_dead.png (300x317) - Renamed from batx with proper scaling
+  - torch.png (170x300) - Power-up collectible item
+- **⚡ Enhanced Performance**: 
+  - 60 FPS locked frame rate across all platforms (Windows, Mac, iOS, Android)
+  - Advanced audio throttling system (50ms) for mobile optimization
+  - Improved collision detection with dynamic bat sizing
+- **🎮 UI Improvements**:
+  - Restart button with click/touch detection
+  - Fever mode timer bar and status display
+  - Enhanced game over screen with better UX
+- **🔧 Technical Enhancements**:
+  - High-resolution rendering (1600x1200 internal resolution)
+  - Cross-platform input handling (keyboard, mouse, touch)
+  - Memory-optimized asset management
+  - Responsive canvas scaling for all devices
+
+#### Previous Updates
+- **Bat Animation System**: Dynamic wing animations with accurate aspect ratios
+- **Physics Engine**: Realistic rock destruction with individual piece physics
+- **Audio System**: Immersive sound effects with mobile optimization
+- **Cross-Platform Support**: Universal compatibility with performance optimization
