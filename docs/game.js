@@ -284,7 +284,9 @@ function update() {
     // 바위 생성 (게임 오버가 아닐 때만)
     if (!gameOver) {
         rockTimer++;
-        if (rockTimer > 90) {
+        // 피버 모드에서도 같은 비율로 기둥 생성 (속도에 비례하여 조정)
+        const spawnThreshold = bat.isFever ? Math.round(90 * 6 / bat.feverSpeed) : 90;
+        if (rockTimer > spawnThreshold) {
             const gapY = Math.random() * (canvasHeight - rockGap - 200) + 100;
 
             // 위쪽 바위 조각들 생성
