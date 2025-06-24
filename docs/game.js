@@ -77,7 +77,8 @@ const sounds = {
     explosion1: new Audio('sounds/Explosion1.ogg'),
     explosion2: new Audio('sounds/Explosion2.ogg'),
     explosion3: new Audio('sounds/Explosion3.ogg'),
-    explosion4: new Audio('sounds/Explosion4.ogg')
+    explosion4: new Audio('sounds/Explosion4.ogg'),
+    successful_hit: new Audio('sounds/Pop.ogg')
 };
 
 // 오디오 볼륨 설정 및 모바일 최적화
@@ -392,6 +393,9 @@ function update() {
             rock.passed = true;
             score++;
             torchSpawnCounter++;
+            
+            // 바위 기둥을 지날 때 Pop 소리 재생
+            playAudioSafe(sounds.successful_hit);
             
             // 10개 기둥마다 토치 생성
             if (torchSpawnCounter >= 10) {
