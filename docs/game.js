@@ -51,14 +51,18 @@ window.addEventListener('orientationchange', () => {
 // 이미지 로드
 const batImg1 = new Image(); // 날개 펴기
 const batImg2 = new Image(); // 날개 접기
-const batImgX = new Image(); // 충돌/사망 상태
+const batImgDead = new Image(); // 충돌/사망 상태
+const batImgFever = new Image(); // 피버 모드
 const rockImg = new Image();
 const logoImg = new Image();
+const torchImg = new Image(); // 토치
 batImg1.src = 'images/bat1.png';
 batImg2.src = 'images/bat2.png';
-batImgX.src = 'images/batx.png';
+batImgDead.src = 'images/bat_dead.png';
+batImgFever.src = 'images/bat_fever.png';
 rockImg.src = 'images/rock.png';
 logoImg.src = 'images/game.png';
+torchImg.src = 'images/torch.png';
 
 // 오디오 로드 및 모바일 최적화
 const sounds = {
@@ -132,15 +136,17 @@ function playRandomExplosionSound() {
 
 // Wait for images to load
 let imagesLoaded = 0;
-const totalImages = 5;
+const totalImages = 7;
 function imageLoaded() {
     imagesLoaded++;
 }
 batImg1.onload = imageLoaded;
 batImg2.onload = imageLoaded;
-batImgX.onload = imageLoaded;
+batImgDead.onload = imageLoaded;
+batImgFever.onload = imageLoaded;
 rockImg.onload = imageLoaded;
 logoImg.onload = imageLoaded;
+torchImg.onload = imageLoaded;
 
 // 게임 상태
 let gameStarted = false;
@@ -177,14 +183,20 @@ const bat = {
     // 충돌 상태
     isDead: false,
     deathRotation: 0,
-    deathRotationSpeed: 0
+    deathRotationSpeed: 0,
+    // 피버 모드
+    isFever: false,
+    feverTimer: 0,
+    feverDuration: 300, // 5초 (60fps * 5)
+    feverSpeed: 24 // 피버 모드 속도 (기본 6의 4배)
 };
 
 // 각 박쥐 이미지별 크기 정의 (실제 이미지 비율 기반)
 const batSizes = {
-    bat1: { width: 121, height: 90 },  // 300x223 비율 (1.34:1)
-    bat2: { width: 121, height: 90 },  // 300x223 비율 (1.34:1)
-    batx: { width: 85, height: 90 }    // 300x317 비율 (0.95:1)
+    bat1: { width: 121, height: 90 },     // 300x223 비율 (1.34:1)
+    bat2: { width: 121, height: 90 },     // 300x223 비율 (1.34:1)
+    bat_dead: { width: 85, height: 90 },  // 300x317 비율 (0.95:1)
+    bat_fever: { width: 204, height: 180 } // 400x353 비율 (1.13:1) - 2배 크기
 };
 
 // 바위 (장애물) - 고해상도에 맞게 크기 조정
@@ -193,6 +205,11 @@ const rockWidth = 160; // 2배 크기
 const rockGap = 360; // 2배 크기
 let rockTimer = 0;
 let caveOffset = 0;
+
+// 토치 시스템
+const torches = [];
+const torchSize = { width: 51, height: 90 }; // 170x300 비율 (0.57:1)
+let torchSpawnCounter = 0; // 기둥 통과 카운터
 
 // 바위 물리 상태
 const rockPhysics = {
@@ -236,6 +253,14 @@ function update() {
     if (!gameOver) {
         bat.velocity += bat.gravity;
         bat.y += bat.velocity;
+        
+        // 피버 모드 타이머 업데이트
+        if (bat.isFever) {
+            bat.feverTimer--;
+            if (bat.feverTimer <= 0) {
+                bat.isFever = false;
+            }
+        }
         
         // 박쥐 애니메이션 업데이트
         updateBatAnimation();
@@ -315,7 +340,8 @@ function update() {
 
         // 바위 이동 (게임 오버가 아닐 때만)
         if (!gameOver) {
-            rock.x -= 6; // 고해상도에 맞게 2배 속도
+            const moveSpeed = bat.isFever ? bat.feverSpeed : 6;
+            rock.x -= moveSpeed;
         }
 
         // 바위 조각들 물리 효과 업데이트 (항상 실행)
@@ -363,6 +389,13 @@ function update() {
         if (!gameOver && !rock.passed && rock.x + rockWidth < bat.x) {
             rock.passed = true;
             score++;
+            torchSpawnCounter++;
+            
+            // 10개 기둥마다 토치 생성
+            if (torchSpawnCounter >= 10) {
+                spawnTorch();
+                torchSpawnCounter = 0;
+            }
         }
 
         // 바위 제거 (게임 오버가 아닐 때만)
@@ -373,8 +406,43 @@ function update() {
 
     // 동굴 스크롤 (게임 오버가 아닐 때만)
     if (!gameOver) {
-        caveOffset -= 6; // 고해상도에 맞게 2배 속도
+        const moveSpeed = bat.isFever ? bat.feverSpeed : 6;
+        caveOffset -= moveSpeed;
         if (caveOffset <= -90) caveOffset = 0; // 2배 크기
+    }
+    
+    // 토치 이동 및 충돌 검사
+    for (let i = torches.length - 1; i >= 0; i--) {
+        const torch = torches[i];
+        
+        // 토치 이동
+        if (!gameOver) {
+            const moveSpeed = bat.isFever ? bat.feverSpeed : 6;
+            torch.x -= moveSpeed;
+        }
+        
+        // 토치 제거 (화면 밖으로 나간 경우)
+        if (torch.x + torchSize.width < 0) {
+            torches.splice(i, 1);
+            continue;
+        }
+        
+        // 토치와 박쥐 충돌 검사
+        const currentBatSize = getCurrentBatImageAndSize();
+        if (!torch.collected && 
+            bat.x < torch.x + torchSize.width && 
+            bat.x + currentBatSize.width > torch.x &&
+            bat.y < torch.y + torchSize.height && 
+            bat.y + currentBatSize.height > torch.y) {
+            
+            // 토치 획득
+            torch.collected = true;
+            bat.isFever = true;
+            bat.feverTimer = bat.feverDuration;
+            
+            // 토치 획득 사운드 (기존 사운드 활용)
+            playRandomIdleSound();
+        }
     }
 
     // 충돌 검사 (동굴 천장과 바닥) - 현재 박쥐 크기로 검사
@@ -408,12 +476,18 @@ function update() {
                     piece.velocityY = Math.random() * 2 + 1;
                     piece.rotationSpeed = (Math.random() - 0.5) * 0.2;
                 });
-                playRandomHurtSound(); // 충돌 소리 재생
-                playRandomExplosionSound(); // 폭발 소리 재생
-                // 충돌 시 박쥐 상태 변경
-                bat.isDead = true;
-                bat.deathRotationSpeed = (Math.random() - 0.5) * 0.3; // 랜덤 회전 속도
-                gameOver = true;
+                
+                if (bat.isFever) {
+                    // 피버 모드에서는 바위만 부수고 계속 진행
+                    playRandomExplosionSound(); // 폭발 소리만 재생
+                } else {
+                    // 일반 모드에서는 게임 오버
+                    playRandomHurtSound(); // 충돌 소리 재생
+                    playRandomExplosionSound(); // 폭발 소리 재생
+                    bat.isDead = true;
+                    bat.deathRotationSpeed = (Math.random() - 0.5) * 0.3;
+                    gameOver = true;
+                }
             }
 
             // 아래쪽 바위와 충돌 (바위 조각들 넘어뜨리기)
@@ -426,12 +500,18 @@ function update() {
                     piece.velocityY = Math.random() * 2;
                     piece.rotationSpeed = direction * (Math.random() * 0.15 + 0.05);
                 });
-                playRandomHurtSound(); // 충돌 소리 재생
-                playRandomExplosionSound(); // 폭발 소리 재생
-                // 충돌 시 박쥐 상태 변경
-                bat.isDead = true;
-                bat.deathRotationSpeed = (Math.random() - 0.5) * 0.3; // 랜덤 회전 속도
-                gameOver = true;
+                
+                if (bat.isFever) {
+                    // 피버 모드에서는 바위만 부수고 계속 진행
+                    playRandomExplosionSound(); // 폭발 소리만 재생
+                } else {
+                    // 일반 모드에서는 게임 오버
+                    playRandomHurtSound(); // 충돌 소리 재생
+                    playRandomExplosionSound(); // 폭발 소리 재생
+                    bat.isDead = true;
+                    bat.deathRotationSpeed = (Math.random() - 0.5) * 0.3;
+                    gameOver = true;
+                }
             }
         }
     }
@@ -470,8 +550,13 @@ function getCurrentBatImageAndSize() {
     
     // 충돌/사망 상태일 때
     if (bat.isDead) {
-        image = batImgX;
-        sizeKey = 'batx';
+        image = batImgDead;
+        sizeKey = 'bat_dead';
+    }
+    // 피버 모드일 때
+    else if (bat.isFever) {
+        image = batImgFever;
+        sizeKey = 'bat_fever';
     }
     // 점프 애니메이션 중일 때
     else if (bat.isFlapping) {
@@ -504,6 +589,16 @@ function getCurrentBatImageAndSize() {
         width: batSizes[sizeKey].width,
         height: batSizes[sizeKey].height
     };
+}
+
+// 토치 생성 함수
+function spawnTorch() {
+    const torch = {
+        x: canvasWidth + 100, // 화면 오른쪽 밖에서 시작
+        y: Math.random() * (canvasHeight - 200) + 100, // 랜덤한 Y 위치
+        collected: false
+    };
+    torches.push(torch);
 }
 
 function draw() {
@@ -595,6 +690,24 @@ function draw() {
         }
     }
 
+    // 토치 렌더링
+    for (const torch of torches) {
+        if (!torch.collected) {
+            ctx.drawImage(torchImg, torch.x, torch.y, torchSize.width, torchSize.height);
+            
+            // 토치 주변에 빛나는 효과
+            if (bat.isFever) {
+                ctx.save();
+                ctx.globalAlpha = 0.3;
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath();
+                ctx.arc(torch.x + torchSize.width/2, torch.y + torchSize.height/2, 30, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+    }
+
     // 박쥐
     const batRender = getCurrentBatImageAndSize();
     
@@ -637,6 +750,21 @@ function draw() {
         ctx.font = '40px Arial';
         ctx.textAlign = 'left';
         ctx.fillText('Score: ' + score, 40, 80);
+        
+        // 피버 모드 표시
+        if (bat.isFever) {
+            ctx.fillStyle = '#FFD700';
+            ctx.font = '32px Arial';
+            ctx.fillText('FEVER MODE!', 40, 130);
+            
+            // 피버 모드 타이머 바
+            const feverProgress = bat.feverTimer / bat.feverDuration;
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(40, 140, 200 * feverProgress, 10);
+            ctx.strokeStyle = '#FFF';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(40, 140, 200, 10);
+        }
     }
 
     if (gameOver) {
@@ -716,10 +844,14 @@ function handleRestart(e) {
         bat.isDead = false;
         bat.deathRotation = 0;
         bat.deathRotationSpeed = 0;
+        bat.isFever = false;
+        bat.feverTimer = 0;
         rocks.length = 0;
         rockTimer = 0;
         score = 0;
         caveOffset = 0;
+        torches.length = 0;
+        torchSpawnCounter = 0;
         restartButton.visible = false;
     }
 }
