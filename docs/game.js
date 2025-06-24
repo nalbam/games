@@ -150,6 +150,15 @@ let countdown = 0;
 let countdownTimer = 0;
 let debugMode = false; // 디버그 모드 (충돌 영역 표시)
 
+// 재시작 버튼 관련
+const restartButton = {
+    x: 0,
+    y: 0,
+    width: 200,
+    height: 60,
+    visible: false
+};
+
 // 박쥐 (각 이미지별 비율에 맞게 크기 조정)
 const bat = {
     x: 300,
@@ -637,12 +646,29 @@ function draw() {
         ctx.fillText('Game Over!', canvasWidth/2, canvasHeight/2);
         ctx.fillText('Score: ' + score, canvasWidth/2, canvasHeight/2 + 60);
         
-        // 입력 방법에 따른 재시작 안내
-        if ('ontouchstart' in window) {
-            ctx.fillText('Touch to restart', canvasWidth/2, canvasHeight/2 + 120);
-        } else {
-            ctx.fillText('Press R or Click to restart', canvasWidth/2, canvasHeight/2 + 120);
-        }
+        // 재시작 버튼 위치 계산
+        restartButton.x = canvasWidth/2 - restartButton.width/2;
+        restartButton.y = canvasHeight/2 + 140;
+        restartButton.visible = true;
+        
+        // 재시작 버튼 그리기
+        ctx.fillStyle = '#4CAF50';
+        ctx.fillRect(restartButton.x, restartButton.y, restartButton.width, restartButton.height);
+        
+        // 버튼 테두리
+        ctx.strokeStyle = '#45a049';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(restartButton.x, restartButton.y, restartButton.width, restartButton.height);
+        
+        // 버튼 텍스트
+        ctx.fillStyle = '#fff';
+        ctx.font = '24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('🔄 Restart', restartButton.x + restartButton.width/2, restartButton.y + 38);
+        
+        // 추가 안내 텍스트
+        ctx.font = '20px Arial';
+        ctx.fillText('Press R key or click button to restart', canvasWidth/2, canvasHeight/2 + 240);
     }
 }
 
@@ -694,7 +720,35 @@ function handleRestart(e) {
         rockTimer = 0;
         score = 0;
         caveOffset = 0;
+        restartButton.visible = false;
     }
+}
+
+// 버튼 클릭 감지 함수
+function isPointInButton(x, y, button) {
+    return x >= button.x && x <= button.x + button.width &&
+           y >= button.y && y <= button.y + button.height;
+}
+
+// 마우스/터치 좌표를 캔버스 좌표로 변환
+function getCanvasCoordinates(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvasWidth / rect.width;
+    const scaleY = canvasHeight / rect.height;
+    
+    let clientX, clientY;
+    if (e.touches && e.touches[0]) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+    
+    return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+    };
 }
 
 // 키보드 입력
@@ -709,8 +763,13 @@ document.addEventListener('keydown', (e) => {
 // 터치 입력 지원
 canvas.addEventListener('touchstart', (e) => {
     e.preventDefault();
+    
     if (gameOver) {
-        handleRestart(e);
+        // 게임 오버 상태에서는 재시작 버튼 클릭 확인
+        const coords = getCanvasCoordinates(e);
+        if (restartButton.visible && isPointInButton(coords.x, coords.y, restartButton)) {
+            handleRestart(e);
+        }
     } else {
         handleGameInput(e);
     }
@@ -723,8 +782,13 @@ canvas.addEventListener('touchend', (e) => {
 // 마우스 클릭 지원
 canvas.addEventListener('mousedown', (e) => {
     e.preventDefault();
+    
     if (gameOver) {
-        handleRestart(e);
+        // 게임 오버 상태에서는 재시작 버튼 클릭 확인
+        const coords = getCanvasCoordinates(e);
+        if (restartButton.visible && isPointInButton(coords.x, coords.y, restartButton)) {
+            handleRestart(e);
+        }
     } else {
         handleGameInput(e);
     }
