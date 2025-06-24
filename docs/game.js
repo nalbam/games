@@ -117,12 +117,12 @@ let countdown = 0;
 let countdownTimer = 0;
 let debugMode = false; // 디버그 모드 (충돌 영역 표시)
 
-// 박쥐 (300px 원본 기준으로 크기 조정)
+// 박쥐 (각 이미지별 비율에 맞게 크기 조정)
 const bat = {
     x: 300,
     y: 600,
-    width: 120, // 300px 원본의 40% 크기
-    height: 90, // 비례 조정
+    baseWidth: 120, // 기본 너비
+    baseHeight: 90, // 기본 높이
     velocity: 0,
     gravity: 1.0, // 고해상도에 맞게 조정
     jump: -16, // 고해상도에 맞게 조정
@@ -136,6 +136,13 @@ const bat = {
     isDead: false,
     deathRotation: 0,
     deathRotationSpeed: 0
+};
+
+// 각 박쥐 이미지별 크기 정의 (실제 이미지 비율 기반)
+const batSizes = {
+    bat1: { width: 121, height: 90 },  // 300x223 비율 (1.34:1)
+    bat2: { width: 121, height: 90 },  // 300x223 비율 (1.34:1)
+    batx: { width: 85, height: 90 }    // 300x317 비율 (0.95:1)
 };
 
 // 바위 (장애물) - 고해상도에 맞게 크기 조정
@@ -152,10 +159,17 @@ const rockPhysics = {
     fallSpeed: 2
 };
 
-// 게임 루프
-function gameLoop() {
-    update();
-    draw();
+// 게임 루프 - 60 FPS 고정
+let lastTime = 0;
+const targetFPS = 60;
+const frameTime = 1000 / targetFPS;
+
+function gameLoop(currentTime) {
+    if (currentTime - lastTime >= frameTime) {
+        update();
+        draw();
+        lastTime = currentTime;
+    }
     requestAnimationFrame(gameLoop);
 }
 
@@ -191,9 +205,10 @@ function update() {
         // 회전 애니메이션
         bat.deathRotation += bat.deathRotationSpeed;
         
-        // 바닥에 닿으면 정지
-        if (bat.y + bat.height >= canvasHeight - 60) {
-            bat.y = canvasHeight - 60 - bat.height;
+        // 바닥에 닿으면 정지 - 현재 박쥐 크기로 계산
+        const batSize = getCurrentBatImageAndSize();
+        if (bat.y + batSize.height >= canvasHeight - 60) {
+            bat.y = canvasHeight - 60 - batSize.height;
             bat.velocity = 0;
             bat.deathRotationSpeed *= 0.8; // 회전 감속
         }
@@ -320,8 +335,9 @@ function update() {
         if (caveOffset <= -90) caveOffset = 0; // 2배 크기
     }
 
-    // 충돌 검사 (동굴 천장과 바닥)
-    if (bat.y <= 60 || bat.y + bat.height >= canvasHeight - 60) {
+    // 충돌 검사 (동굴 천장과 바닥) - 현재 박쥐 크기로 검사
+    const currentBatSize = getCurrentBatImageAndSize();
+    if (bat.y <= 60 || bat.y + currentBatSize.height >= canvasHeight - 60) {
         if (!gameOver) {
             playRandomHurtSound(); // 벽 충돌 소리 재생
             playRandomExplosionSound(); // 폭발 소리 재생
@@ -334,7 +350,7 @@ function update() {
 
     for (const rock of rocks) {
         const rockMargin = rockWidth * 0.05;
-        if (bat.x < rock.x + rockWidth - rockMargin && bat.x + bat.width > rock.x + rockMargin) {
+        if (bat.x < rock.x + rockWidth - rockMargin && bat.x + currentBatSize.width > rock.x + rockMargin) {
             // 실제 바위가 그려지는 끝점까지 충돌 검사 (렌더링과 동일한 로직)
             let actualTopEnd = 0;
             for (let y = 0; y < rock.topHeight; y += 90) { // 2배 크기
@@ -359,7 +375,7 @@ function update() {
             }
 
             // 아래쪽 바위와 충돌 (바위 조각들 넘어뜨리기)
-            if (bat.y + bat.height > rock.bottomY + rockMargin && !rock.bottomCollapsed) {
+            if (bat.y + currentBatSize.height > rock.bottomY + rockMargin && !rock.bottomCollapsed) {
                 rock.bottomCollapsed = true;
                 // 충돌 방향에 따른 초기 속도 설정
                 const direction = bat.x < rock.x + rockWidth / 2 ? 1 : -1;
@@ -406,25 +422,46 @@ function updateBatAnimation() {
     }
 }
 
-// 현재 박쥐 이미지 반환 함수
-function getCurrentBatImage() {
+// 현재 박쥐 이미지와 크기 반환 함수
+function getCurrentBatImageAndSize() {
+    let image, sizeKey;
+    
     // 충돌/사망 상태일 때
     if (bat.isDead) {
-        return batImgX;
+        image = batImgX;
+        sizeKey = 'batx';
     }
-    
     // 점프 애니메이션 중일 때
-    if (bat.isFlapping) {
-        return bat.flapPhase === 0 ? batImg1 : batImg2; // 0: 펼치기, 1: 접기
+    else if (bat.isFlapping) {
+        if (bat.flapPhase === 0) {
+            image = batImg1;
+            sizeKey = 'bat1';
+        } else {
+            image = batImg2;
+            sizeKey = 'bat2';
+        }
     }
-    
     // 떨어질 때(하강 중)는 날개 펴기 (bat1)
-    if (bat.velocity > 2) {
-        return batImg1;
+    else if (bat.velocity > 2) {
+        image = batImg1;
+        sizeKey = 'bat1';
+    }
+    // 일반 상태에서는 애니메이션 프레임에 따라 (자연스러운 날개짓)
+    else {
+        if (bat.animationFrame === 0) {
+            image = batImg2;
+            sizeKey = 'bat2';
+        } else {
+            image = batImg1;
+            sizeKey = 'bat1';
+        }
     }
     
-    // 일반 상태에서는 애니메이션 프레임에 따라 (자연스러운 날개짓)
-    return bat.animationFrame === 0 ? batImg2 : batImg1;
+    return {
+        image: image,
+        width: batSizes[sizeKey].width,
+        height: batSizes[sizeKey].height
+    };
 }
 
 function draw() {
@@ -517,25 +554,25 @@ function draw() {
     }
 
     // 박쥐
-    const currentBatImg = getCurrentBatImage();
+    const batRender = getCurrentBatImageAndSize();
     
     if (bat.isDead && bat.deathRotation !== 0) {
         // 회전하면서 그리기
         ctx.save();
-        ctx.translate(bat.x + bat.width/2, bat.y + bat.height/2);
+        ctx.translate(bat.x + batRender.width/2, bat.y + batRender.height/2);
         ctx.rotate(bat.deathRotation);
-        ctx.drawImage(currentBatImg, -bat.width/2, -bat.height/2, bat.width, bat.height);
+        ctx.drawImage(batRender.image, -batRender.width/2, -batRender.height/2, batRender.width, batRender.height);
         ctx.restore();
     } else {
         // 일반 그리기
-        ctx.drawImage(currentBatImg, bat.x, bat.y, bat.width, bat.height);
+        ctx.drawImage(batRender.image, bat.x, bat.y, batRender.width, batRender.height);
     }
 
     // 박쥐 충돌 영역 표시 (디버그 모드)
     if (debugMode) {
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 2;
-        ctx.strokeRect(bat.x, bat.y, bat.width, bat.height);
+        ctx.strokeRect(bat.x, bat.y, batRender.width, batRender.height);
     }
 
     // Cave ceiling and floor (가장 앞에 렌더링)
