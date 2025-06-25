@@ -5,69 +5,68 @@
     <img src="./docs/images/game.png" alt="Flappy Bat Logo" width="300">
   </a>
   <br>
-  <a href="https://nalbam.github.io/flappy-bat/">🎮 Play Game</a>
+  <a href="https://nalbam.github.io/flappy-bat/">🎮 게임 플레이</a>
 </div>
 
-A simple flappy bat game built with HTML5 Canvas and JavaScript.
+Phaser.js를 사용하여 제작된 간단한 박쥐 게임입니다.
 
-*Created with Amazon Q Developer - AI-powered coding assistant*
+*Claude Code - AI 코딩 어시스턴트로 제작*
 
-## Game Overview
+## 게임 개요
 
-- **Genre**: Side-scrolling 2D Arcade with Power-ups
-- **Character**: Bat with multiple forms (Normal, Fever, Dead)
-- **Controls**: SPACEBAR/Click/Touch → Flap wings (fly up)
-- **Physics**: Realistic gravity and momentum-based flight
-- **Obstacles**: Destructible rock pillars with physics
-- **Environment**: Moving rocky cave with dynamic effects
-- **Special Features**: Fever Mode with torch collection system
-- **Performance**: 60 FPS locked across all platforms
+- **장르**: 파워업이 있는 횡스크롤 2D 아케이드
+- **캐릭터**: 여러 형태를 가진 박쥐 (일반, 피버, 죽음)
+- **조작**: 스페이스바/클릭/터치 → 날개 펄럭이기 (위로 날기)
+- **물리**: 현실적인 중력과 관성 기반 비행
+- **장애물**: 물리 엔진이 적용된 파괴 가능한 바위 기둥
+- **환경**: 역동적인 효과가 있는 움직이는 바위 동굴
+- **특별 기능**: 횃불 수집 시스템과 피버 모드
 
-## How to Play
+## 게임 방법
 
-### 🎮 Controls
-- **Desktop**: SPACEBAR or Click to flap wings
-- **Mobile**: Touch screen to flap wings
-- **Restart**: Press R key or Click/Touch after game over
+### 🎮 조작법
+- **데스크톱**: 스페이스바 또는 클릭으로 날개 펄럭이기
+- **모바일**: 화면 터치로 날개 펄럭이기
+- **재시작**: 게임 오버 후 R키 누르기 또는 클릭/터치
 
-### 🎯 Gameplay
-1. **Start Game**: Press SPACEBAR, Click, or Touch to begin
-2. **Control Bat**:
-   - Press SPACEBAR, Click, or Touch to flap wings and fly up
-   - Release to let gravity pull the bat down
-3. **Navigate Obstacles**: Fly through gaps between destructible rock pillars
-4. **Collect Torches**: Every 10 obstacles passed spawns a torch at random location
-5. **Activate Fever Mode**: Touch a torch to become a giant, invincible bat
-6. **Fever Mode Powers**:
-   - 2x larger size (giant bat)
-   - 4x faster speed (ultra-fast movement)
-   - Invincible to rock collisions (destroy rocks instead)
-   - 5-second duration with timer bar
-7. **Score Points**: Each obstacle passed increases your score
-8. **Game Over**: Collision with rocks, ceiling, or floor ends the game (except in Fever Mode)
-9. **Restart**: Use R key or click Restart button to play again
+### 🎯 게임플레이
+1. **게임 시작**: 스페이스바, 클릭, 또는 터치로 시작
+2. **박쥐 조작**:
+   - 스페이스바, 클릭, 또는 터치로 날개를 펄럭이며 위로 날기
+   - 놓으면 중력에 의해 박쥐가 아래로 떨어짐
+3. **장애물 통과**: 파괴 가능한 바위 기둥 사이의 틈새로 날아가기
+4. **횃불 수집**: 10개의 장애물을 통과할 때마다 무작위 위치에 횃불 생성
+5. **피버 모드 활성화**: 횃불을 터치하여 거대하고 무적인 박쥐가 되기
+6. **피버 모드 능력**:
+   - 2배 큰 크기 (거대한 박쥐)
+   - 4배 빠른 속도 (초고속 이동)
+   - 바위 충돌 무적 (바위를 파괴함)
+   - 타이머 바와 함께 5초 지속
+7. **점수 획득**: 각 장애물을 통과할 때마다 점수 증가
+8. **게임 오버**: 바위, 천장, 또는 바닥과 충돌 시 게임 종료 (피버 모드 제외)
+9. **재시작**: R키 또는 재시작 버튼 클릭으로 다시 플레이
 
-## Game Assets
+## 게임 에셋
 
-### Images
-- **Bat Animation Sprites**:
-  - [bat1.png](./images/bat1.png) - Wings spread (300x223) - Gliding/falling
-  - [bat2.png](./images/bat2.png) - Wings folded (300x223) - Jumping/flapping
-  - [bat_dead.png](./images/bat_dead.png) - Dead state (300x317) - Game over
-  - [bat_fever.png](./images/bat_fever.png) - Fever mode (400x353) - Power-up state
-- **Power-up Items**:
-  - [torch.png](./images/torch.png) - Fever mode trigger (170x300)
-- **Environment**:
-  - [rock.png](./images/rock.png) - Destructible rock texture
-  - [game.png](./images/game.png) - Game logo
+### 이미지
+- **박쥐 스프라이트**:
+  - [bat1.png](./images/bat1.png) - 날개 펼친 상태 (300x223) - 활공/낙하
+  - [bat2.png](./images/bat2.png) - 날개 접은 상태 (300x223) - 점프/펄럭임
+  - [bat_dead.png](./images/bat_dead.png) - 죽은 상태 (300x317) - 게임 오버
+  - [bat_fever.png](./images/bat_fever.png) - 피버 모드 (400x353) - 파워업 상태
+- **파워업 아이템**:
+  - [torch.png](./images/torch.png) - 피버 모드 트리거 (170x300)
+- **환경**:
+  - [rock.png](./images/rock.png) - 파괴 가능한 바위 텍스처 (300x286)
+  - [game.png](./images/game.png) - 게임 로고 (1024x1024)
 
-### Sound Effects
-- **Wing Flap**: [Bat_takeoff.ogg](./sounds/Bat_takeoff.ogg) - Jump/flap sound
-- **Power-up Sounds**: Bat_idle1-4.ogg (4 variations) - Torch collection & game start
-- **Collision Sounds**: Bat_hurt1-3.ogg (3 variations) - Rock collision damage
-- **Destruction Effects**: Explosion1-4.ogg (4 variations) - Rock breaking sounds
+### 사운드 이펙트
+- **날개 펄럭임**: [Bat_takeoff.ogg](./sounds/Bat_takeoff.ogg) - 점프/펄럭임 소리
+- **파워업 사운드**: Bat_idle1-4.ogg (4가지 변형) - 횃불 수집 및 게임 시작
+- **충돌 사운드**: Bat_hurt1-3.ogg (3가지 변형) - 바위 충돌 피해
+- **파괴 효과**: Explosion1-4.ogg (4가지 변형) - 바위 부서지는 소리
 
-## Source Code
+## 소스 코드
 
-- **Game Logic**: [game.js](./game.js) - Main game engine with physics, collision detection, and rendering
-- **HTML Page**: [index.html](./index.html) - Responsive web page with mobile optimization
+- **게임 로직**: [game.js](./game.js) - 물리, 충돌 감지, 렌더링을 포함한 메인 게임 엔진 (Phaser.js 사용)
+- **HTML 페이지**: [index.html](./index.html) - 모바일 최적화가 적용된 반응형 웹 페이지
