@@ -12,6 +12,11 @@ class SpaceDodgeGame {
         this.speed = 0.1;
         this.obstacleSpawnRate = 0.02;
         
+        // Collision animation
+        this.isColliding = false;
+        this.collisionTime = 0;
+        this.explosionParticles = [];
+        
         this.keys = {
             left: false,
             right: false,
@@ -235,6 +240,9 @@ class SpaceDodgeGame {
                 this.lives--;
                 this.updateUI();
                 
+                // Trigger collision animation
+                this.triggerCollisionAnimation(obstacle.position);
+                
                 if (this.lives <= 0) {
                     this.gameOver();
                 }
@@ -245,6 +253,89 @@ class SpaceDodgeGame {
     checkCollision(obj1, obj2) {
         const distance = obj1.position.distanceTo(obj2.position);
         return distance < 0.8; // Collision threshold
+    }
+    
+    triggerCollisionAnimation(position) {
+        this.isColliding = true;
+        this.collisionTime = 0;
+        
+        // Create explosion particles
+        for (let i = 0; i < 15; i++) {
+            const particle = this.createExplosionParticle(position);
+            this.explosionParticles.push(particle);
+            this.scene.add(particle);
+        }
+        
+        // Screen shake effect
+        this.camera.position.x += (Math.random() - 0.5) * 0.3;
+        this.camera.position.y += (Math.random() - 0.5) * 0.3;
+    }
+    
+    createExplosionParticle(position) {
+        const geometry = new THREE.SphereGeometry(0.05, 8, 8);
+        const material = new THREE.MeshLambertMaterial({ 
+            color: Math.random() > 0.5 ? 0xff4444 : 0xffaa00 
+        });
+        const particle = new THREE.Mesh(geometry, material);
+        
+        particle.position.copy(position);
+        
+        // Random velocity
+        particle.velocity = new THREE.Vector3(
+            (Math.random() - 0.5) * 0.3,
+            (Math.random() - 0.5) * 0.3,
+            (Math.random() - 0.5) * 0.3
+        );
+        
+        particle.life = 1.0;
+        particle.decay = 0.02;
+        
+        return particle;
+    }
+    
+    updateCollisionAnimation() {
+        if (this.isColliding) {
+            this.collisionTime += 0.016; // Assuming 60fps
+            
+            // Player flashing effect
+            if (this.collisionTime < 1.0) {
+                const flash = Math.sin(this.collisionTime * 20) > 0;
+                this.player.material.color.setHex(flash ? 0xff0000 : 0x00aaff);
+            } else {
+                this.isColliding = false;
+                this.player.material.color.setHex(0x00aaff); // Reset to blue
+                
+                // Reset camera position
+                this.camera.position.x = 0;
+                this.camera.position.y = 0;
+            }
+        }
+        
+        // Update explosion particles
+        for (let i = this.explosionParticles.length - 1; i >= 0; i--) {
+            const particle = this.explosionParticles[i];
+            
+            // Move particle
+            particle.position.add(particle.velocity);
+            
+            // Apply gravity
+            particle.velocity.y -= 0.01;
+            
+            // Fade out
+            particle.life -= particle.decay;
+            particle.material.opacity = particle.life;
+            particle.material.transparent = true;
+            
+            // Scale down
+            const scale = particle.life;
+            particle.scale.set(scale, scale, scale);
+            
+            // Remove dead particles
+            if (particle.life <= 0) {
+                this.scene.remove(particle);
+                this.explosionParticles.splice(i, 1);
+            }
+        }
     }
     
     spawnObstacles() {
@@ -281,6 +372,16 @@ class SpaceDodgeGame {
         this.obstacles.forEach(obstacle => this.scene.remove(obstacle));
         this.obstacles = [];
         
+        // Clear explosion particles
+        this.explosionParticles.forEach(particle => this.scene.remove(particle));
+        this.explosionParticles = [];
+        
+        // Reset collision state
+        this.isColliding = false;
+        this.collisionTime = 0;
+        this.player.material.color.setHex(0x00aaff);
+        this.camera.position.set(0, 0, 10);
+        
         // Reset player position
         this.player.position.set(0, -4, 0);
         
@@ -299,6 +400,9 @@ class SpaceDodgeGame {
             this.speed += 0.0002;
             this.obstacleSpawnRate += 0.00001;
         }
+        
+        // Always update collision animation
+        this.updateCollisionAnimation();
     }
     
     animate() {
