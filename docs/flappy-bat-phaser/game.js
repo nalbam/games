@@ -42,13 +42,12 @@ class GameScene extends Phaser.Scene {
         this.physics.world.gravity.y = 1600;
 
         this.cameras.main.setBackgroundColor('#1a1a2e');
-        
+
         this.particles = this.add.group();
-        
+
         this.createSounds();
         this.createControls();
 
-        this.lastSpawnTime = 0;
 
         this.createStartScreen();
     }
@@ -106,7 +105,7 @@ class GameScene extends Phaser.Scene {
             fill: '#ffffff',
             fontFamily: 'Arial'
         });
-        
+
         this.distanceText = this.add.text(40, 100, 'Distance: 0m', {
             fontSize: '32px',
             fill: '#ffffff',
@@ -168,11 +167,11 @@ class GameScene extends Phaser.Scene {
 
     createStartScreen() {
         console.log('Creating start screen - gameWidth:', this.gameWidth, 'gameHeight:', this.gameHeight);
-        
+
         this.logo = this.add.image(this.gameWidth / 2, this.gameHeight / 2 - 150, 'game_logo');
         this.logo.setScale(0.5);
         console.log('Logo created at:', this.logo.x, this.logo.y);
-        
+
         this.startButton = this.add.text(this.gameWidth / 2, this.gameHeight / 2 + 100,
             'START GAME', {
             fontSize: '64px',
@@ -184,19 +183,19 @@ class GameScene extends Phaser.Scene {
         this.startButton.setOrigin(0.5);
         this.startButton.setInteractive();
         console.log('Start button created at:', this.startButton.x, this.startButton.y);
-        
+
         this.startButton.on('pointerover', () => {
             this.startButton.setStyle({ fill: '#ffff00', backgroundColor: '#555555' });
         });
-        
+
         this.startButton.on('pointerout', () => {
             this.startButton.setStyle({ fill: '#ffffff', backgroundColor: '#333333' });
         });
-        
+
         this.startButton.on('pointerdown', () => {
             this.startGame();
         });
-        
+
         this.instructionText = this.add.text(this.gameWidth / 2, this.gameHeight / 2 + 200,
             'Space/Click/Touch to Flap Wings', {
             fontSize: '32px',
@@ -237,18 +236,18 @@ class GameScene extends Phaser.Scene {
         this.gameState = 'playing';
         this.gameStartTime = this.time.now;
         this.distance = 0;
-        this.lastObstacleDistance = 0;
+        this.lastObstacleDistance = -this.obstacleInterval;
         this.lastTorchDistance = 0;
         this.logo.destroy();
         this.startButton.destroy();
         this.instructionText.destroy();
-        
+
         this.createBackground();
         this.createPlayer();
         this.createObstacles();
         this.createUI();
         this.setupCollisions();
-        
+
         this.player.setVelocityY(-600);
         this.sounds.flap.play();
     }
@@ -278,7 +277,7 @@ class GameScene extends Phaser.Scene {
 
         this.player.angle = Math.min(Math.max(this.player.body.velocity.y * 0.1, -30), 30);
     }
-    
+
     updateDistance() {
         if (this.gameState === 'playing' && this.gameStartTime > 0) {
             const gameTime = (this.time.now - this.gameStartTime) / 1000;
@@ -288,13 +287,13 @@ class GameScene extends Phaser.Scene {
             this.distanceText.setText('Distance: ' + this.distance + 'm');
         }
     }
-    
+
     checkSpawning() {
         if (this.distance - this.lastObstacleDistance >= this.obstacleInterval) {
             this.spawnObstacle();
             this.lastObstacleDistance = this.distance;
         }
-        
+
         if (this.distance - this.lastTorchDistance >= this.torchInterval) {
             this.spawnTorch();
             this.lastTorchDistance = this.distance;
@@ -348,10 +347,6 @@ class GameScene extends Phaser.Scene {
 
     spawnObstacle() {
         if (this.gameState !== 'playing') return;
-        
-        const currentTime = this.time.now;
-        if (currentTime - this.lastSpawnTime < 800) return;
-        this.lastSpawnTime = currentTime;
 
         const obstacleScale = 0.35;
         const ceilingHeight = 286 * 0.25;
@@ -445,7 +440,7 @@ class GameScene extends Phaser.Scene {
         this.physics.overlap(this.player, this.torches, this.collectTorch, null, this);
 
         let scoredColumns = [];
-        
+
         this.obstacles.children.entries.forEach(obstacle => {
             if (!obstacle.scored && obstacle.x < this.player.x) {
                 if (!scoredColumns.includes(obstacle.columnId)) {
@@ -582,7 +577,7 @@ class GameScene extends Phaser.Scene {
 
     updateParticles() {
         if (!this.particles || !this.particles.children) return;
-        
+
         this.particles.children.entries.forEach(particle => {
             particle.x += particle.velocityX * 0.016;
             particle.y += particle.velocityY * 0.016;
@@ -643,14 +638,13 @@ class GameScene extends Phaser.Scene {
         this.obstaclesPassed = 0;
         this.distance = 0;
         this.gameStartTime = this.time.now;
-        this.lastObstacleDistance = 0;
-        this.lastTorchDistance = 0;
+        this.lastObstacleDistance = -this.obstacleInterval;
+        this.lastTorchDistance = -this.torchInterval;
         this.obstacleInterval = 15;
         this.torchInterval = 150;
         this.feverMode = false;
         this.feverTimer = 0;
-        this.lastSpawnTime = 0;
-        
+
         // 타이머 완전 정리
         if (this.obstacleTimer) {
             this.obstacleTimer.destroy();
@@ -658,23 +652,23 @@ class GameScene extends Phaser.Scene {
         if (this.feverObstacleTimer) {
             this.feverObstacleTimer.destroy();
         }
-        
+
         // 모든 트윈 애니메이션 정리
         this.tweens.killAll();
-        
+
         // 기존 게임 객체들 완전 정리
         if (this.player) {
             this.player.destroy();
             this.player = null;
         }
-        
+
         if (this.obstacles) {
             this.obstacles.children.entries.forEach(obstacle => {
                 if (obstacle.destroy) obstacle.destroy();
             });
             this.obstacles.clear(true, true);
         }
-        
+
         if (this.torches) {
             this.torches.children.entries.forEach(torch => {
                 if (torch.glow && torch.glow.destroy) torch.glow.destroy();
@@ -682,22 +676,22 @@ class GameScene extends Phaser.Scene {
             });
             this.torches.clear(true, true);
         }
-        
+
         if (this.ceiling) {
             this.ceiling.clear(true, true);
         }
-        
+
         if (this.floor) {
             this.floor.clear(true, true);
         }
-        
+
         if (this.particles) {
             this.particles.children.entries.forEach(particle => {
                 if (particle.destroy) particle.destroy();
             });
             this.particles.clear(true, true);
         }
-        
+
         // UI 요소들 완전 정리
         if (this.scoreText) {
             this.scoreText.destroy();
@@ -715,20 +709,20 @@ class GameScene extends Phaser.Scene {
             this.feverText.destroy();
             this.feverText = null;
         }
-        
+
         // 모든 텍스트 객체 정리 (게임 오버 텍스트 포함)
         this.children.list.slice().forEach(child => {
             if (child.type === 'Text' || child.type === 'Graphics') {
                 child.destroy();
             }
         });
-        
+
         // 게임 재시작
         this.createBackground();
         this.createPlayer();
         this.createUI();
         this.setupCollisions();
-        
+
         this.player.setVelocityY(-600);
         this.sounds.flap.play();
     }
