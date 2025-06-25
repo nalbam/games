@@ -376,21 +376,24 @@ class GameScene extends Phaser.Scene {
         if (this.gameState !== 'playing') return;
 
         const obstacleScale = 0.35;
+        const rockHeight = 286 * obstacleScale;
         const ceilingHeight = 286 * 0.25;
         const floorHeight = 286 * 0.25;
         const gapSize = 360;
-        const minHeight = ceilingHeight + 50;
-        const maxHeight = this.gameHeight - floorHeight - gapSize - 50;
-        const height = Phaser.Math.Between(minHeight, maxHeight);
+        
+        // 틈새 위치 랜덤 결정
+        const minGapTop = ceilingHeight + 50;
+        const maxGapTop = this.gameHeight - floorHeight - gapSize - 50;
+        const gapTop = Phaser.Math.Between(minGapTop, maxGapTop);
+        const gapBottom = gapTop + gapSize;
 
         const columnId = 'column_' + Date.now();
-
         const moveSpeed = this.feverMode ? -800 : -400;
         const spawnX = this.gameWidth + 400;
 
-        const rocksPerColumn = Math.floor(height / (286 * obstacleScale));
-        for (let i = 0; i < rocksPerColumn; i++) {
-            const topRock = this.obstacles.create(spawnX, i * (286 * obstacleScale), 'rock');
+        // 윗 기둥: 천장에서 아래로
+        for (let y = ceilingHeight; y < gapTop; y += rockHeight) {
+            const topRock = this.obstacles.create(spawnX, y, 'rock');
             topRock.setOrigin(0, 0);
             topRock.setScale(obstacleScale);
             topRock.body.setSize(300, 286);
@@ -401,12 +404,9 @@ class GameScene extends Phaser.Scene {
             topRock.columnId = columnId;
         }
 
-        const bottomStart = height + gapSize;
-        const availableHeight = this.gameHeight - floorHeight - bottomStart;
-        const bottomRocksCount = Math.ceil(availableHeight / (286 * obstacleScale));
-
-        for (let i = 0; i < bottomRocksCount; i++) {
-            const bottomRock = this.obstacles.create(spawnX, bottomStart + i * (286 * obstacleScale), 'rock');
+        // 아래 기둥: 바닥에서 위로
+        for (let y = this.gameHeight - floorHeight - rockHeight; y > gapBottom; y -= rockHeight) {
+            const bottomRock = this.obstacles.create(spawnX, y, 'rock');
             bottomRock.setOrigin(0, 0);
             bottomRock.setScale(obstacleScale);
             bottomRock.body.setSize(300, 286);
@@ -416,7 +416,6 @@ class GameScene extends Phaser.Scene {
             bottomRock.scored = false;
             bottomRock.columnId = columnId;
         }
-
 
         this.obstaclesPassed++;
     }
@@ -460,19 +459,20 @@ class GameScene extends Phaser.Scene {
         let scoredColumns = new Set();
 
         this.obstacles.children.entries.forEach(obstacle => {
-            if (!obstacle.scored && obstacle.x + obstacle.width < this.player.x && obstacle.columnId) {
+            if (!obstacle.scored && obstacle.x < this.player.x && obstacle.columnId) {
                 if (!scoredColumns.has(obstacle.columnId)) {
                     scoredColumns.add(obstacle.columnId);
                     this.score += 1;
                     this.scoreText.setText('Score: ' + this.score);
                     this.playSoundSafe('success', 200);
+                    
+                    // 같은 컬럼의 모든 바위에 점수 획득 표시
+                    this.obstacles.children.entries.forEach(rock => {
+                        if (rock.columnId === obstacle.columnId) {
+                            rock.scored = true;
+                        }
+                    });
                 }
-                
-                this.obstacles.children.entries.forEach(rock => {
-                    if (rock.columnId === obstacle.columnId) {
-                        rock.scored = true;
-                    }
-                });
             }
         });
     }
@@ -519,8 +519,6 @@ class GameScene extends Phaser.Scene {
     }
 
     startFeverMode() {
-        if (this.feverMode) return;
-        
         this.feverMode = true;
         this.feverTimer = this.feverDuration;
         this.player.setTexture('bat_fever');
