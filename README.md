@@ -1,248 +1,88 @@
-# Flappy Bat
+# 🎮 Simple Games Collection
 
-<div align="center">
-  <a href="https://nalbam.github.io/flappy-bat/">
-    <img src="./docs/images/game.png" alt="Flappy Bat Logo" width="300">
-  </a>
-  <br>
-  <a href="https://nalbam.github.io/flappy-bat/">🎮 Play Game</a>
-</div>
+간단하고 중독성 있는 캐주얼 게임들을 모아둔 프로젝트입니다.
 
-A simple flappy bat game built with HTML5 Canvas and JavaScript.
+## 🎯 게임 목록
 
-*Created with Amazon Q Developer - AI-powered coding assistant*
+### ✅ 완성된 게임
 
-## Game Overview
+#### 0. Flappy Bat (박쥐 날기)
+**🎮 [지금 플레이하기](https://nalbam.github.io/games/flappy-bat/)**
 
-- **Genre**: Side-scrolling 2D Arcade with Power-ups
-- **Character**: Bat with multiple forms (Normal, Fever, Dead)
-- **Controls**: SPACEBAR/Click/Touch → Flap wings (fly up)
-- **Physics**: Realistic gravity and momentum-based flight
-- **Obstacles**: Destructible rock pillars with physics
-- **Environment**: Moving rocky cave with dynamic effects
-- **Special Features**: Fever Mode with torch collection system
-- **Performance**: 60 FPS locked across all platforms
+박쥐가 되어 동굴 속 바위 기둥을 피해 날아가는 게임입니다.
+- **컨셉**: 중력을 이용한 날개 조작으로 장애물 회피
+- **특징**: 페버 모드, 파괴 가능한 환경, 60 FPS 부드러운 애니메이션
+- **플랫폼**: 웹 (PC, 모바일 모두 지원)
+- **[상세 정보](https://nalbam.github.io/games/flappy-bat/)**
 
-## How to Play
+---
 
-### 🎮 Controls
-- **Desktop**: SPACEBAR or Click to flap wings
-- **Mobile**: Touch screen to flap wings
-- **Restart**: Press R key or Click/Touch after game over
+### 📝 아이디어 목록
 
-### 🎯 Gameplay
-1. **Start Game**: Press SPACEBAR, Click, or Touch to begin
-2. **Control Bat**: 
-   - Press SPACEBAR, Click, or Touch to flap wings and fly up
-   - Release to let gravity pull the bat down
-3. **Navigate Obstacles**: Fly through gaps between destructible rock pillars
-4. **Collect Torches**: Every 10 obstacles passed spawns a torch at random location
-5. **Activate Fever Mode**: Touch a torch to become a giant, invincible bat
-6. **Fever Mode Powers**: 
-   - 2x larger size (giant bat)
-   - 4x faster speed (ultra-fast movement)
-   - Invincible to rock collisions (destroy rocks instead)
-   - 5-second duration with timer bar
-7. **Score Points**: Each obstacle passed increases your score
-8. **Game Over**: Collision with rocks, ceiling, or floor ends the game (except in Fever Mode)
-9. **Restart**: Use R key or click Restart button to play again
+#### 1. Wall Jumper (벽타기 점프)
+- **컨셉**: 양쪽 벽을 튕기며 위로 올라가는 점프 게임
+- **핵심 메커닉**: 자동 벽 바운스 + 타이밍 점프
+- **포인트**: 점프 타이밍과 간격 조절의 묘미
 
-### 📱 Mobile Optimized
-- Responsive design works on all devices
-- Touch controls for smartphones and tablets
-- Optimized performance for iOS and Android
-- Full-screen gameplay experience
+#### 2. Sky Diver (스카이다이빙 회피)
+- **컨셉**: 낙하산 병사가 하늘에서 떨어지며 장애물 회피
+- **핵심 메커닉**: 좌우 이동으로 새, 헬기, 드론 피하기
+- **포인트**: 가속도와 랜덤 바람 효과
 
-## Game Features
+#### 3. Bounce Ball (튕기는 공)
+- **컨셉**: 자동 점프하는 공으로 스파이크 회피
+- **핵심 메커닉**: 벽과 바닥의 반사각 활용
+- **포인트**: 물리 기반 반사와 타이밍 마스터
 
-### 🎮 Core Gameplay
-- **Fullscreen Display**: Responsive design that fills the entire browser window
-- **Cross-Platform Performance**: 60 FPS locked on Windows, Mac, iOS, and Android
-- **Advanced Physics**: Gravity, momentum, and realistic object destruction
-- **Multiple Bat Forms**: Normal (2 animations), Fever (giant), and Death states
-- **Progressive Difficulty**: Obstacles become more challenging over time
+#### 4. Lava Climber (용암 피하기)
+- **컨셉**: 아래에서 차오르는 용암을 피해 플랫폼 점프
+- **핵심 메커닉**: 랜덤 플랫폼 생성, 일부 붕괴형
+- **포인트**: 빠른 판단력과 점프 정확도
 
-### 🔥 Fever Mode System
-- **Torch Collection**: Spawns every 10 obstacles at random locations
-- **Giant Bat Transformation**: 2x size increase with fever sprite
-- **Super Speed**: 4x movement speed (24 vs 6 pixels/frame)
-- **Invincibility**: Destroy rocks instead of dying on collision
-- **Visual Feedback**: "FEVER MODE!" text and countdown timer bar
-- **Duration**: 5-second power-up with real-time timer
+#### 5. Tunnel Racer (터널 레이서)
+- **컨셉**: Flappy Bird 스타일로 좁아지는 터널 통과
+- **핵심 메커닉**: 위아래 조작으로 공간 통과
+- **포인트**: 점진적 난이도 상승과 속도 증가
 
-### 🎨 Visual & Audio
-- **Dynamic Animations**: Wing flapping responds to movement and input
-- **Destructible Environment**: Rocks break into physics-based pieces
-- **Realistic Destruction**: Rock pieces fall, bounce, and settle naturally
-- **Immersive Audio**: Wing flaps, collisions, explosions, and power-up sounds
-- **Visual Effects**: Glowing torch effects and fever mode indicators
-- **Responsive UI**: Restart button, score display, and fever mode status
+#### 6. Space Dodge (우주 잔해 회피)
+- **컨셉**: 우주선으로 우주 쓰레기 무한 회피
+- **핵심 메커닉**: 자동 전진 + 방향 조작
+- **포인트**: 360도 회피 액션의 재미
 
-### 🛠️ Technical Features
-- **Asset Loading**: Safe image loading with progress indicator
-- **Debug Mode**: Visual collision area display (disabled by default)
-- **Precise Collision**: Accurate detection matching visual boundaries
-- **Mobile Optimization**: Performance tuning for iOS and Android
-- **Audio Throttling**: Performance-optimized sound system
-- **Memory Management**: Efficient object pooling and cleanup
+#### 7. Stick Runner (스틱맨 달리기)
+- **컨셉**: 자동 달리기 + 장애물 점프/슬라이드
+- **핵심 메커닉**: 점프와 슬라이드 이중 조작
+- **포인트**: 타이밍 기반 정확한 액션
 
-## Game Assets
+#### 8. Ghost Tapper (유령 탭)
+- **컨셉**: 어두운 환경에서 유령이 장애물 회피
+- **핵심 메커닉**: 위아래 이동으로 횃불, 십자가 피하기
+- **포인트**: 시야 제한과 점점 좁아지는 공간
 
-### Images
-- **Bat Animation Sprites**: 
-  - [bat1.png](./docs/images/bat1.png) - Wings spread (300x223) - Gliding/falling
-  - [bat2.png](./docs/images/bat2.png) - Wings folded (300x223) - Jumping/flapping
-  - [bat_dead.png](./docs/images/bat_dead.png) - Dead state (300x317) - Game over
-  - [bat_fever.png](./docs/images/bat_fever.png) - Fever mode (400x353) - Power-up state
-- **Power-up Items**:
-  - [torch.png](./docs/images/torch.png) - Fever mode trigger (170x300)
-- **Environment**:
-  - [rock.png](./docs/images/rock.png) - Destructible rock texture
-  - [game.png](./docs/images/game.png) - Game logo
+#### 9. Mine Cart Escape (광산 카트 탈출)
+- **컨셉**: 광산 카트를 타고 레일 변경하며 탈출
+- **핵심 메커닉**: 좌우 레일 변경 + 경사로 점프
+- **포인트**: 빠른 반응속도와 경로 판단
 
-### Sound Effects
-- **Wing Flap**: [Bat_takeoff.ogg](./docs/sounds/Bat_takeoff.ogg) - Jump/flap sound
-- **Power-up Sounds**: Bat_idle1-4.ogg (4 variations) - Torch collection & game start
-- **Collision Sounds**: Bat_hurt1-3.ogg (3 variations) - Rock collision damage
-- **Destruction Effects**: Explosion1-4.ogg (4 variations) - Rock breaking sounds
+#### 10. Color Gate (색 문 통과)
+- **컨셉**: 색상 변경으로 특정 색 문만 통과
+- **핵심 메커닉**: 주기적 색상 변경 + 문 통과
+- **포인트**: 빠른 반응과 색상 인지 능력
 
-## Source Code
+## 🛠️ 개발 환경
 
-- **Game Logic**: [game.js](./docs/game.js)
-- **HTML Page**: [index.html](./docs/index.html)
+- **언어**: HTML5 Canvas + JavaScript
+- **스타일**: 순수 웹 기술 사용 (프레임워크 없음)
+- **플랫폼**: 웹 브라우저 (PC, 모바일 호환)
+- **개발 도구**: AI 코딩 어시스턴트 활용
 
-## How to Run
+## 🎯 프로젝트 목표
 
-### 🌐 Play Online
-Visit: **https://nalbam.github.io/flappy-bat/**
+1. **심플함**: 1분 안에 배울 수 있는 직관적인 조작
+2. **중독성**: 계속 도전하고 싶은 게임 메커닉
+3. **접근성**: 어디서나 쉽게 플레이할 수 있는 웹 게임
+4. **완성도**: 작지만 완벽한 게임 경험 제공
 
-### 💻 Run Locally
-1. Clone this repository
-2. Open `docs/index.html` in a web browser
-3. Press SPACEBAR, Click, or Touch to start playing
-4. Enjoy the game!
+---
 
-## Game Mechanics
-
-### Basic Physics
-- **Screen Size**: 1600x1200 pixels (high-resolution, fullscreen display)
-- **Bat Sizes**: 
-  - Normal: 121x90 pixels (bat1/bat2)
-  - Dead: 85x90 pixels (bat_dead)
-  - Fever: 204x180 pixels (bat_fever - 2x larger)
-- **Jump Force**: -16 velocity units
-- **Gravity**: 1.0 acceleration per frame (bat), 0.3 (rock pieces)
-- **Movement Speeds**: 
-  - Normal: 6 pixels per frame
-  - Fever Mode: 24 pixels per frame (4x faster)
-- **Rock Specifications**: 
-  - Width: 160 pixels
-  - Gap: 360 pixels between rock pillars
-  - Spawn Rate: Every 90 frames (~1.5 seconds at 60 FPS)
-- **Cave Boundaries**: 60px ceiling and floor collision zones
-
-### Fever Mode Mechanics
-- **Activation**: Collect torch (spawns every 10 obstacles)
-- **Torch Size**: 51x90 pixels (170x300 source ratio)
-- **Duration**: 300 frames (5 seconds at 60 FPS)
-- **Effects**: Giant size, 4x speed, invincibility to rocks
-- **Visual Timer**: Real-time countdown bar display
-
-### Animation System
-- **Normal Mode Animations**:
-  - Jump: Wings spread (bat1) → Wings folded (bat2)
-  - Falling: Wings spread for gliding
-  - Idle: Natural wing flapping cycle (20 frames)
-  - Rapid Input: Faster wing animation on consecutive jumps
-  - Timing: 12 frames (normal), 8 frames (rapid)
-- **Fever Mode**: Giant bat_fever sprite with enhanced visual effects
-- **Death Animation**: bat_dead sprite with rotation effects
-
-### Collision & Destruction
-- **Collision Detection**: Precise collision matching visual boundaries
-- **Rock Destruction**: Individual 90-pixel rock pieces with realistic physics
-- **Normal Mode**: Collision with rocks causes game over + rock destruction
-- **Fever Mode**: Collision destroys rocks but bat continues (invincible)
-- **Rock Physics**: 
-  - Top rocks: Fall and scatter on collision
-  - Bottom rocks: Tip over in collision direction
-  - Ground settling: Pieces settle on cave floor (60px from bottom)
-  - Friction: 0.7 coefficient when pieces hit ground
-  - Rotation: Individual piece rotation with momentum
-
-### Audio System
-- **Wing Flap**: Plays on every jump input (SPACEBAR/Click/Touch)
-- **Game Start**: Random idle sound after countdown
-- **Normal Collision**: Simultaneous hurt + explosion sounds (game over)
-- **Fever Collision**: Explosion sound only (no hurt sound, continues playing)
-- **Torch Collection**: Random idle sound for power-up feedback
-- **Performance**: 50ms throttling to prevent audio overlap on mobile
-- **Volume**: All sounds at 50% with mobile optimization
-
-## Development
-
-This game was developed using **Claude Code**, an AI-powered coding assistant that helped with:
-- Game logic implementation
-- Advanced physics and collision detection
-- Dynamic rock destruction system
-- Bat animation system implementation
-- Image rendering and smooth animations
-- Audio system integration
-- Asset loading and error handling
-- Cave boundary collision fixes
-- Score tracking system
-- Code optimization and debugging
-
-## Technical Features
-
-### Rock Physics Engine
-- Individual rock pieces with unique physics properties
-- Realistic gravity, rotation, and collision mechanics
-- Dynamic destruction based on collision direction
-- Ground friction and settling behavior
-
-### Sound System
-- Multiple audio file format support (.ogg)
-- Random sound selection for variety
-- Audio error handling and fallback
-- Optimized audio loading and playback
-
-### Visual Effects
-- Real-time rock breaking animation
-- Dynamic bat wing animations
-- Smooth 60 FPS rendering
-- Asset loading screen with progress indicator
-- Debug mode for collision visualization
-- Responsive canvas scaling
-
-### Recent Updates
-
-#### Version 2.0 - Fever Mode Update
-- **🔥 Fever Mode System**: Complete power-up system with torch collection
-  - Giant bat transformation (2x size, 4x speed)
-  - Invincibility to rock collisions with destruction effects
-  - Visual timer bar and "FEVER MODE!" display
-  - 5-second duration with real-time countdown
-- **🎨 New Visual Assets**: 
-  - bat_fever.png (400x353) - Giant fever mode sprite
-  - bat_dead.png (300x317) - Renamed from batx with proper scaling
-  - torch.png (170x300) - Power-up collectible item
-- **⚡ Enhanced Performance**: 
-  - 60 FPS locked frame rate across all platforms (Windows, Mac, iOS, Android)
-  - Advanced audio throttling system (50ms) for mobile optimization
-  - Improved collision detection with dynamic bat sizing
-- **🎮 UI Improvements**:
-  - Restart button with click/touch detection
-  - Fever mode timer bar and status display
-  - Enhanced game over screen with better UX
-- **🔧 Technical Enhancements**:
-  - High-resolution rendering (1600x1200 internal resolution)
-  - Cross-platform input handling (keyboard, mouse, touch)
-  - Memory-optimized asset management
-  - Responsive canvas scaling for all devices
-
-#### Previous Updates
-- **Bat Animation System**: Dynamic wing animations with accurate aspect ratios
-- **Physics Engine**: Realistic rock destruction with individual piece physics
-- **Audio System**: Immersive sound effects with mobile optimization
-- **Cross-Platform Support**: Universal compatibility with performance optimization
+*간단하지만 재미있는 게임을 만들어보세요! 🎮*

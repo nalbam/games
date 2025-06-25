@@ -1,79 +1,320 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-  <title>Flappy Bat</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body { 
-      margin: 0; 
-      padding: 0; 
-      overflow: hidden; 
-      background-color: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
-    }
-    
-    #gameContainer {
-      position: relative;
-      max-width: 100vw;
-      max-height: 100vh;
-      aspect-ratio: 4/3; /* 1600x1200 비율 */
-    }
-    
-    canvas { 
-      background: black; 
-      display: block; 
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: -moz-crisp-edges;
-      image-rendering: crisp-edges;
-      image-rendering: pixelated;
-      border: 2px solid #333;
-      border-radius: 8px;
-    }
-    
-    /* 반응형 크기 조정 */
-    @media (max-aspect-ratio: 4/3) {
-      #gameContainer {
-        width: 100vw;
-        height: 75vw; /* 4:3 비율 유지 */
-      }
-    }
-    
-    @media (min-aspect-ratio: 4/3) {
-      #gameContainer {
-        width: 133.33vh; /* 4:3 비율 유지 */
-        height: 100vh;
-      }
-    }
-    
-    /* 모바일 최적화 */
-    @media (max-width: 768px) {
-      canvas {
-        border-radius: 0;
-        border: none;
-      }
-      #gameContainer {
-        max-width: 100vw;
-        max-height: 100vh;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Simple Games Collection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        h1 {
+            color: white;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .game-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .game-icon {
+            font-size: 2rem;
+        }
+        
+        .game-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .game-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+        
+        .game-features li {
+            color: #555;
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+        
+        .game-features li::before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .play-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .play-button:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        .coming-soon {
+            background: #f5f5f5;
+            border: 2px dashed #ddd;
+        }
+        
+        .coming-soon .play-button {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .coming-soon .play-button:hover {
+            background: #ccc;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .status-completed {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .status-coming-soon {
+            background: rgba(255, 193, 7, 0.1);
+            color: #FF9800;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+        
+        footer {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            margin-top: 50px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .game-card {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="gameContainer">
-    <canvas id="gameCanvas" width="1600" height="1200"></canvas>
-  </div>
-  <script src="game.js"></script>
+    <div class="container">
+        <header>
+            <h1>🎮 Simple Games Collection</h1>
+            <p class="subtitle">간단하고 중독성 있는 캐주얼 게임들을 모아둔 프로젝트</p>
+        </header>
+        
+        <div class="games-grid">
+            <!-- 완성된 게임 -->
+            <div class="game-card">
+                <div class="status-badge status-completed">✅ 완성</div>
+                <h2 class="game-title">
+                    <span class="game-icon">🦇</span>
+                    Flappy Bat
+                </h2>
+                <p class="game-description">
+                    박쥐가 되어 동굴 속 바위 기둥을 피해 날아가는 게임입니다.
+                </p>
+                <ul class="game-features">
+                    <li>페버 모드와 특수 효과</li>
+                    <li>파괴 가능한 환경</li>
+                    <li>60 FPS 부드러운 애니메이션</li>
+                    <li>PC, 모바일 모두 지원</li>
+                </ul>
+                <a href="flappy-bat/" class="play-button">🎮 지금 플레이하기</a>
+            </div>
+            
+            <!-- 개발 예정 게임들 -->
+            <div class="game-card coming-soon">
+                <div class="status-badge status-coming-soon">🚧 개발 예정</div>
+                <h2 class="game-title">
+                    <span class="game-icon">🧗</span>
+                    Wall Jumper
+                </h2>
+                <p class="game-description">
+                    양쪽 벽을 튕기며 위로 올라가는 점프 게임
+                </p>
+                <ul class="game-features">
+                    <li>자동 벽 바운스 시스템</li>
+                    <li>타이밍 기반 점프</li>
+                    <li>점진적 난이도 상승</li>
+                </ul>
+                <a href="#" class="play-button">곧 출시 예정</a>
+            </div>
+            
+            <div class="game-card coming-soon">
+                <div class="status-badge status-coming-soon">🚧 개발 예정</div>
+                <h2 class="game-title">
+                    <span class="game-icon">🪂</span>
+                    Sky Diver
+                </h2>
+                <p class="game-description">
+                    낙하산 병사가 하늘에서 떨어지며 장애물을 회피하는 게임
+                </p>
+                <ul class="game-features">
+                    <li>좌우 이동 조작</li>
+                    <li>랜덤 바람 효과</li>
+                    <li>다양한 공중 장애물</li>
+                </ul>
+                <a href="#" class="play-button">곧 출시 예정</a>
+            </div>
+            
+            <div class="game-card coming-soon">
+                <div class="status-badge status-coming-soon">🚧 개발 예정</div>
+                <h2 class="game-title">
+                    <span class="game-icon">⚽</span>
+                    Bounce Ball
+                </h2>
+                <p class="game-description">
+                    자동 점프하는 공으로 스파이크를 회피하는 게임
+                </p>
+                <ul class="game-features">
+                    <li>물리 기반 반사 시스템</li>
+                    <li>벽과 바닥 반사각 활용</li>
+                    <li>타이밍 마스터 요소</li>
+                </ul>
+                <a href="#" class="play-button">곧 출시 예정</a>
+            </div>
+            
+            <div class="game-card coming-soon">
+                <div class="status-badge status-coming-soon">🚧 개발 예정</div>
+                <h2 class="game-title">
+                    <span class="game-icon">🌋</span>
+                    Lava Climber
+                </h2>
+                <p class="game-description">
+                    아래에서 차오르는 용암을 피해 플랫폼을 점프하는 게임
+                </p>
+                <ul class="game-features">
+                    <li>랜덤 플랫폼 생성</li>
+                    <li>붕괴형 플랫폼</li>
+                    <li>빠른 판단력 요구</li>
+                </ul>
+                <a href="#" class="play-button">곧 출시 예정</a>
+            </div>
+            
+            <div class="game-card coming-soon">
+                <div class="status-badge status-coming-soon">🚧 개발 예정</div>
+                <h2 class="game-title">
+                    <span class="game-icon">🚇</span>
+                    Tunnel Racer
+                </h2>
+                <p class="game-description">
+                    점점 좁아지는 터널을 통과하는 레이싱 게임
+                </p>
+                <ul class="game-features">
+                    <li>위아래 조작 시스템</li>
+                    <li>점진적 속도 증가</li>
+                    <li>동적 터널 생성</li>
+                </ul>
+                <a href="#" class="play-button">곧 출시 예정</a>
+            </div>
+            
+            <div class="game-card coming-soon">
+                <div class="status-badge status-coming-soon">🚧 개발 예정</div>
+                <h2 class="game-title">
+                    <span class="game-icon">🚀</span>
+                    Space Dodge
+                </h2>
+                <p class="game-description">
+                    우주선으로 우주 쓰레기를 무한 회피하는 게임
+                </p>
+                <ul class="game-features">
+                    <li>360도 회피 액션</li>
+                    <li>자동 전진 시스템</li>
+                    <li>다양한 우주 장애물</li>
+                </ul>
+                <a href="#" class="play-button">곧 출시 예정</a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>간단하지만 재미있는 게임을 만들어보세요! 🎮</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">
+                <a href="https://github.com/nalbam/games" style="color: rgba(255,255,255,0.8);">GitHub에서 소스코드 보기</a>
+            </p>
+        </footer>
+    </div>
 </body>
 </html>
