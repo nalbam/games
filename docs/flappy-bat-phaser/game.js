@@ -633,27 +633,94 @@ class GameScene extends Phaser.Scene {
         this.obstaclesPassed = 0;
         this.feverMode = false;
         this.feverTimer = 0;
+        this.lastSpawnTime = 0;
         
-        // 기존 게임 객체들 정리
-        if (this.player) this.player.destroy();
-        this.obstacles.clear(true, true);
-        this.torches.clear(true, true);
-        this.ceiling.clear(true, true);
-        this.floor.clear(true, true);
-        this.particles.clear(true, true);
+        // 타이머 완전 정리
+        if (this.obstacleTimer) {
+            this.obstacleTimer.destroy();
+        }
+        if (this.feverObstacleTimer) {
+            this.feverObstacleTimer.destroy();
+        }
         
-        // UI 요소들 정리
-        if (this.scoreText) this.scoreText.destroy();
-        if (this.feverBar) this.feverBar.destroy();
-        if (this.feverText) this.feverText.destroy();
+        // 모든 트윈 애니메이션 정리
+        this.tweens.killAll();
         
-        // 게임 오버 텍스트 제거
-        this.children.list.forEach(child => {
-            if (child.type === 'Text' && child.text && child.text.includes('Game Over')) {
+        // 기존 게임 객체들 완전 정리
+        if (this.player) {
+            this.player.destroy();
+            this.player = null;
+        }
+        
+        if (this.obstacles) {
+            this.obstacles.children.entries.forEach(obstacle => {
+                if (obstacle.destroy) obstacle.destroy();
+            });
+            this.obstacles.clear(true, true);
+        }
+        
+        if (this.torches) {
+            this.torches.children.entries.forEach(torch => {
+                if (torch.glow && torch.glow.destroy) torch.glow.destroy();
+                if (torch.destroy) torch.destroy();
+            });
+            this.torches.clear(true, true);
+        }
+        
+        if (this.ceiling) {
+            this.ceiling.clear(true, true);
+        }
+        
+        if (this.floor) {
+            this.floor.clear(true, true);
+        }
+        
+        if (this.particles) {
+            this.particles.children.entries.forEach(particle => {
+                if (particle.destroy) particle.destroy();
+            });
+            this.particles.clear(true, true);
+        }
+        
+        // UI 요소들 완전 정리
+        if (this.scoreText) {
+            this.scoreText.destroy();
+            this.scoreText = null;
+        }
+        if (this.feverBar) {
+            this.feverBar.destroy();
+            this.feverBar = null;
+        }
+        if (this.feverText) {
+            this.feverText.destroy();
+            this.feverText = null;
+        }
+        
+        // 모든 텍스트 객체 정리 (게임 오버 텍스트 포함)
+        this.children.list.slice().forEach(child => {
+            if (child.type === 'Text' || child.type === 'Graphics') {
                 child.destroy();
             }
         });
         
+        // 타이머 재생성
+        this.obstacleTimer = this.time.addEvent({
+            delay: 2000,
+            callback: this.spawnObstacle,
+            callbackScope: this,
+            loop: true,
+            paused: true
+        });
+
+        this.feverObstacleTimer = this.time.addEvent({
+            delay: 1000,
+            callback: this.spawnObstacle,
+            callbackScope: this,
+            loop: true,
+            paused: true
+        });
+        
+        // 게임 재시작
         this.createBackground();
         this.createPlayer();
         this.createUI();
