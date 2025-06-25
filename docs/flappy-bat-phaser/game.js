@@ -29,6 +29,8 @@ class GameScene extends Phaser.Scene {
         this.gameState = 'start';
         this.score = 0;
         this.obstaclesPassed = 0;
+        this.distance = 0;
+        this.gameStartTime = 0;
         this.feverMode = false;
         this.feverTimer = 0;
         this.feverDuration = 10000;
@@ -113,6 +115,12 @@ class GameScene extends Phaser.Scene {
     createUI() {
         this.scoreText = this.add.text(40, 40, 'Score: 0', {
             fontSize: '48px',
+            fill: '#ffffff',
+            fontFamily: 'Arial'
+        });
+        
+        this.distanceText = this.add.text(40, 100, 'Distance: 0m', {
+            fontSize: '32px',
             fill: '#ffffff',
             fontFamily: 'Arial'
         });
@@ -221,6 +229,7 @@ class GameScene extends Phaser.Scene {
             this.updatePlayer();
             this.updateObstacles();
             this.updateFever();
+            this.updateDistance();
             this.checkCollisions();
 
             if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
@@ -237,6 +246,8 @@ class GameScene extends Phaser.Scene {
 
     startGame() {
         this.gameState = 'playing';
+        this.gameStartTime = this.time.now;
+        this.distance = 0;
         this.logo.destroy();
         this.startButton.destroy();
         this.instructionText.destroy();
@@ -278,6 +289,16 @@ class GameScene extends Phaser.Scene {
         if (this.player.isDead) return;
 
         this.player.angle = Math.min(Math.max(this.player.body.velocity.y * 0.1, -30), 30);
+    }
+    
+    updateDistance() {
+        if (this.gameState === 'playing' && this.gameStartTime > 0) {
+            const gameTime = (this.time.now - this.gameStartTime) / 1000;
+            const baseSpeed = this.feverMode ? 800 : 400;
+            const pixelsPerMeter = 50;
+            this.distance = Math.floor(gameTime * baseSpeed / pixelsPerMeter);
+            this.distanceText.setText('Distance: ' + this.distance + 'm');
+        }
     }
 
     updateObstacles() {
@@ -631,6 +652,8 @@ class GameScene extends Phaser.Scene {
         this.gameState = 'playing';
         this.score = 0;
         this.obstaclesPassed = 0;
+        this.distance = 0;
+        this.gameStartTime = this.time.now;
         this.feverMode = false;
         this.feverTimer = 0;
         this.lastSpawnTime = 0;
@@ -686,6 +709,10 @@ class GameScene extends Phaser.Scene {
         if (this.scoreText) {
             this.scoreText.destroy();
             this.scoreText = null;
+        }
+        if (this.distanceText) {
+            this.distanceText.destroy();
+            this.distanceText = null;
         }
         if (this.feverBar) {
             this.feverBar.destroy();
