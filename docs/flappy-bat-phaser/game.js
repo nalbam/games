@@ -1,4 +1,4 @@
-const DEBUG_MODE = false;
+const DEBUG_MODE = true;
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -26,6 +26,7 @@ class GameScene extends Phaser.Scene {
         this.gameWidth = this.sys.game.config.width;
         this.gameHeight = this.sys.game.config.height;
 
+
         this.gameState = 'start';
         this.score = 0;
         this.obstaclesPassed = 0;
@@ -39,7 +40,6 @@ class GameScene extends Phaser.Scene {
         this.feverTimer = 0;
         this.feverDuration = 10000;
 
-        this.physics.world.gravity.y = 1600;
 
         this.cameras.main.setBackgroundColor('#1a1a2e');
 
@@ -85,7 +85,7 @@ class GameScene extends Phaser.Scene {
         this.player.setBounce(0.2);
         this.player.setCollideWorldBounds(false);
 
-        this.player.body.setSize(300 * batScale * 2, 223 * batScale * 2, true);
+        this.player.body.setSize(300 * batScale * 0.8, 223 * batScale * 0.8, true);
 
         this.player.animFrame = 0;
         this.player.animTimer = 0;
@@ -141,6 +141,17 @@ class GameScene extends Phaser.Scene {
         this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
         this.lastSpacePress = 0;
+        
+        if (!this.lastSoundTime) {
+            this.lastSoundTime = {
+                flap: 0,
+                hit: 0,
+                powerup: 0,
+                explosion: 0,
+                pop: 0,
+                success: 0
+            };
+        }
 
         this.input.on('pointerdown', () => {
             if (this.gameState === 'start') {
@@ -151,6 +162,14 @@ class GameScene extends Phaser.Scene {
                 this.restartGame();
             }
         });
+    }
+
+    playSoundSafe(soundName, minInterval = 100) {
+        const currentTime = this.time.now;
+        if (currentTime - this.lastSoundTime[soundName] >= minInterval) {
+            this.sounds[soundName].play();
+            this.lastSoundTime[soundName] = currentTime;
+        }
     }
 
     setupCollisions() {
@@ -248,8 +267,9 @@ class GameScene extends Phaser.Scene {
         this.createUI();
         this.setupCollisions();
 
+
         this.player.setVelocityY(-600);
-        this.sounds.flap.play();
+        this.playSoundSafe('flap', 100);
     }
 
     flapWings() {
@@ -257,7 +277,7 @@ class GameScene extends Phaser.Scene {
 
         this.player.setVelocityY(-800);
         this.player.isFlapping = true;
-        this.sounds.flap.play();
+        this.playSoundSafe('flap', 100);
 
         if (this.feverMode) {
             this.player.setTexture('bat_fever');
@@ -280,11 +300,12 @@ class GameScene extends Phaser.Scene {
 
     updateDistance() {
         if (this.gameState === 'playing' && this.gameStartTime > 0) {
-            const gameTime = (this.time.now - this.gameStartTime) / 1000;
-            const baseSpeed = this.feverMode ? 800 : 400;
-            const pixelsPerMeter = 50;
-            this.distance = Math.floor(gameTime * baseSpeed / pixelsPerMeter);
-            this.distanceText.setText('Distance: ' + this.distance + 'm');
+            const deltaTime = this.game.loop.delta / 1000;
+            const currentSpeed = this.feverMode ? 16 : 8;
+            
+            // 거리를 점진적으로 증가 (급변 방지)
+            this.distance += currentSpeed * deltaTime;
+            this.distanceText.setText('Distance: ' + Math.floor(this.distance) + 'm');
         }
     }
 
@@ -309,6 +330,12 @@ class GameScene extends Phaser.Scene {
 
         this.torches.children.entries.forEach(torch => {
             if (torch.x < -100) {
+                if (torch.glow) {
+                    torch.glow.destroy();
+                }
+                if (torch.tween) {
+                    torch.tween.destroy();
+                }
                 torch.destroy();
             }
         });
@@ -390,15 +417,6 @@ class GameScene extends Phaser.Scene {
             bottomRock.columnId = columnId;
         }
 
-        const extraRock = this.obstacles.create(spawnX, this.gameHeight - floorHeight - (286 * obstacleScale), 'rock');
-        extraRock.setOrigin(0, 0);
-        extraRock.setScale(obstacleScale);
-        extraRock.body.setSize(300, 286);
-        extraRock.setVelocityX(moveSpeed);
-        extraRock.body.setGravityY(-1600);
-        extraRock.setDepth(-1);
-        extraRock.scored = false;
-        extraRock.columnId = columnId;
 
         this.obstaclesPassed++;
     }
@@ -425,7 +443,7 @@ class GameScene extends Phaser.Scene {
         glow.fillCircle(0, 0, 30);
         torch.glow = glow;
 
-        this.tweens.add({
+        torch.tween = this.tweens.add({
             targets: torch,
             scaleX: torchScale + 0.03,
             scaleY: torchScale + 0.03,
@@ -439,17 +457,22 @@ class GameScene extends Phaser.Scene {
         this.physics.overlap(this.player, this.obstacles, this.hitObstacle, null, this);
         this.physics.overlap(this.player, this.torches, this.collectTorch, null, this);
 
-        let scoredColumns = [];
+        let scoredColumns = new Set();
 
         this.obstacles.children.entries.forEach(obstacle => {
-            if (!obstacle.scored && obstacle.x < this.player.x) {
-                if (!scoredColumns.includes(obstacle.columnId)) {
-                    scoredColumns.push(obstacle.columnId);
+            if (!obstacle.scored && obstacle.x + obstacle.width < this.player.x && obstacle.columnId) {
+                if (!scoredColumns.has(obstacle.columnId)) {
+                    scoredColumns.add(obstacle.columnId);
                     this.score += 1;
                     this.scoreText.setText('Score: ' + this.score);
-                    this.sounds.success.play();
+                    this.playSoundSafe('success', 200);
                 }
-                obstacle.scored = true;
+                
+                this.obstacles.children.entries.forEach(rock => {
+                    if (rock.columnId === obstacle.columnId) {
+                        rock.scored = true;
+                    }
+                });
             }
         });
     }
@@ -457,10 +480,10 @@ class GameScene extends Phaser.Scene {
     hitObstacle(player, obstacle) {
         if (this.feverMode) {
             this.destroyObstacle(obstacle);
-            this.sounds.explosion.play();
+            this.playSoundSafe('explosion', 100);
         } else {
             this.collapseColumn(obstacle.columnId);
-            this.sounds.hit.play();
+            this.playSoundSafe('hit', 300);
             this.gameOver();
         }
     }
@@ -484,20 +507,26 @@ class GameScene extends Phaser.Scene {
 
     collectTorch(player, torch) {
         this.startFeverMode();
-        this.sounds.powerup.play();
-        torch.destroy();
+        this.playSoundSafe('powerup', 200);
+        
         if (torch.glow) {
             torch.glow.destroy();
         }
+        if (torch.tween) {
+            torch.tween.destroy();
+        }
+        torch.destroy();
     }
 
     startFeverMode() {
+        if (this.feverMode) return;
+        
         this.feverMode = true;
         this.feverTimer = this.feverDuration;
         this.player.setTexture('bat_fever');
         const feverBatScale = 0.6;
         this.player.setScale(feverBatScale);
-        this.player.body.setSize(400 * feverBatScale * 2, 353 * feverBatScale * 2, true);
+        this.player.body.setSize(400 * feverBatScale * 0.8, 353 * feverBatScale * 0.8, true);
 
         this.obstacles.children.entries.forEach(rock => {
             if (rock.body.gravity.y <= 0) {
@@ -530,7 +559,7 @@ class GameScene extends Phaser.Scene {
         this.player.setTexture('bat1');
         const normalBatScale = 0.4;
         this.player.setScale(normalBatScale);
-        this.player.body.setSize(300 * normalBatScale * 2, 223 * normalBatScale * 2, true);
+        this.player.body.setSize(300 * normalBatScale * 0.8, 223 * normalBatScale * 0.8, true);
 
         this.obstacles.children.entries.forEach(rock => {
             if (rock.body.gravity.y <= 0) {
@@ -578,10 +607,12 @@ class GameScene extends Phaser.Scene {
     updateParticles() {
         if (!this.particles || !this.particles.children) return;
 
+        const deltaTime = this.game.loop.delta / 1000;
+        
         this.particles.children.entries.forEach(particle => {
-            particle.x += particle.velocityX * 0.016;
-            particle.y += particle.velocityY * 0.016;
-            particle.life -= 16;
+            particle.x += particle.velocityX * deltaTime;
+            particle.y += particle.velocityY * deltaTime;
+            particle.life -= this.game.loop.delta;
 
             if (particle.life <= 0) {
                 particle.destroy();
@@ -633,25 +664,19 @@ class GameScene extends Phaser.Scene {
     }
 
     restartGame() {
+        
         this.gameState = 'playing';
         this.score = 0;
         this.obstaclesPassed = 0;
         this.distance = 0;
         this.gameStartTime = this.time.now;
         this.lastObstacleDistance = -this.obstacleInterval;
-        this.lastTorchDistance = -this.torchInterval;
+        this.lastTorchDistance = 0;
         this.obstacleInterval = 15;
         this.torchInterval = 150;
         this.feverMode = false;
         this.feverTimer = 0;
 
-        // 타이머 완전 정리
-        if (this.obstacleTimer) {
-            this.obstacleTimer.destroy();
-        }
-        if (this.feverObstacleTimer) {
-            this.feverObstacleTimer.destroy();
-        }
 
         // 모든 트윈 애니메이션 정리
         this.tweens.killAll();
@@ -672,6 +697,7 @@ class GameScene extends Phaser.Scene {
         if (this.torches) {
             this.torches.children.entries.forEach(torch => {
                 if (torch.glow && torch.glow.destroy) torch.glow.destroy();
+                if (torch.tween && torch.tween.destroy) torch.tween.destroy();
                 if (torch.destroy) torch.destroy();
             });
             this.torches.clear(true, true);
@@ -722,9 +748,15 @@ class GameScene extends Phaser.Scene {
         this.createPlayer();
         this.createUI();
         this.setupCollisions();
+        
+        // 사운드 타이머 초기화
+        Object.keys(this.lastSoundTime).forEach(key => {
+            this.lastSoundTime[key] = 0;
+        });
+
 
         this.player.setVelocityY(-600);
-        this.sounds.flap.play();
+        this.playSoundSafe('flap', 100);
     }
 }
 
@@ -736,7 +768,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 800 },
+            gravity: { y: 1600 },
             debug: DEBUG_MODE
         }
     },
