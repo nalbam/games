@@ -467,7 +467,7 @@ class GameScene extends Phaser.Scene {
     destroyObstacle(obstacle) {
         this.createExplosion(obstacle.x, obstacle.y);
         obstacle.destroy();
-        this.score += 10;
+        this.score += 1;
         this.scoreText.setText('Score: ' + this.score);
     }
 
@@ -635,6 +635,7 @@ class GameScene extends Phaser.Scene {
         this.feverTimer = 0;
         
         // 기존 게임 객체들 정리
+        if (this.player) this.player.destroy();
         this.obstacles.clear(true, true);
         this.torches.clear(true, true);
         this.ceiling.clear(true, true);
@@ -656,6 +657,7 @@ class GameScene extends Phaser.Scene {
         this.createBackground();
         this.createPlayer();
         this.createUI();
+        this.setupCollisions();
         
         this.spawnObstacle();
         this.obstacleTimer.paused = false;
