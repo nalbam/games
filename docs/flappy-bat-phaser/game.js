@@ -32,7 +32,7 @@ class GameScene extends Phaser.Scene {
         this.feverTimer = 0;
         this.feverDuration = 10000;
 
-        this.physics.world.gravity.y = 800;
+        this.physics.world.gravity.y = 1600;
 
         this.createBackground();
         this.createPlayer();
@@ -57,6 +57,8 @@ class GameScene extends Phaser.Scene {
             loop: true,
             paused: true
         });
+        
+        this.lastSpawnTime = 0;
 
         this.createStartScreen();
     }
@@ -67,29 +69,29 @@ class GameScene extends Phaser.Scene {
         this.ceiling = this.physics.add.group();
         this.floor = this.physics.add.group();
 
-        const rockScale = 0.125;
+        const rockScale = 0.25;
         const rockWidth = 300 * rockScale;
 
         for (let x = -rockWidth * 5; x < this.gameWidth + rockWidth * 10; x += rockWidth) {
             let ceilingRock = this.ceiling.create(x, 0, 'rock');
             ceilingRock.setOrigin(0, 0);
             ceilingRock.setScale(rockScale);
-            ceilingRock.setVelocityX(-200);
-            ceilingRock.body.setGravityY(-800);
+            ceilingRock.setVelocityX(-400);
+            ceilingRock.body.setGravityY(-1600);
             ceilingRock.body.setImmovable(true);
 
             let floorRock = this.floor.create(x, this.gameHeight - (286 * rockScale), 'rock');
             floorRock.setOrigin(0, 0);
             floorRock.setScale(rockScale);
-            floorRock.setVelocityX(-200);
-            floorRock.body.setGravityY(-800);
+            floorRock.setVelocityX(-400);
+            floorRock.body.setGravityY(-1600);
             floorRock.body.setImmovable(true);
         }
     }
 
     createPlayer() {
         this.player = this.physics.add.sprite(150, this.gameHeight / 2, 'bat1');
-        const batScale = 0.2;
+        const batScale = 0.4;
         this.player.setScale(batScale);
         this.player.setBounce(0.2);
         this.player.setCollideWorldBounds(false);
@@ -109,8 +111,8 @@ class GameScene extends Phaser.Scene {
     }
 
     createUI() {
-        this.scoreText = this.add.text(20, 20, 'Score: 0', {
-            fontSize: '24px',
+        this.scoreText = this.add.text(40, 40, 'Score: 0', {
+            fontSize: '48px',
             fill: '#ffffff',
             fontFamily: 'Arial'
         });
@@ -118,8 +120,8 @@ class GameScene extends Phaser.Scene {
         this.feverBar = this.add.graphics();
         this.feverBar.visible = false;
 
-        this.feverText = this.add.text(this.gameWidth / 2, 50, 'FEVER MODE!', {
-            fontSize: '32px',
+        this.feverText = this.add.text(this.gameWidth / 2, 100, 'FEVER MODE!', {
+            fontSize: '64px',
             fill: '#ffff00',
             fontFamily: 'Arial'
         });
@@ -171,7 +173,7 @@ class GameScene extends Phaser.Scene {
     createStartScreen() {
         this.startText = this.add.text(this.gameWidth / 2, this.gameHeight / 2,
             'Flappy Bat\n\nSpace/Click/Touch to Start', {
-            fontSize: '32px',
+            fontSize: '64px',
             fill: '#ffffff',
             fontFamily: 'Arial',
             align: 'center'
@@ -208,14 +210,14 @@ class GameScene extends Phaser.Scene {
         this.spawnObstacle();
         this.obstacleTimer.paused = false;
         this.feverObstacleTimer.paused = true;
-        this.player.setVelocityY(-300);
+        this.player.setVelocityY(-600);
         this.sounds.flap.play();
     }
 
     flapWings() {
         if (this.player.isDead) return;
 
-        this.player.setVelocityY(-400);
+        this.player.setVelocityY(-800);
         this.player.isFlapping = true;
         this.sounds.flap.play();
 
@@ -251,7 +253,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        const rockWidth = 300 * 0.125;
+        const rockWidth = 300 * 0.25;
 
         this.ceiling.children.entries.forEach(rock => {
             if (rock.x < -rockWidth * 2) {
@@ -274,8 +276,8 @@ class GameScene extends Phaser.Scene {
 
             this.feverBar.clear();
             this.feverBar.fillStyle(0xffff00);
-            this.feverBar.fillRect(this.gameWidth / 2 - 100, 80,
-                (this.feverTimer / this.feverDuration) * 200, 10);
+            this.feverBar.fillRect(this.gameWidth / 2 - 200, 160,
+                (this.feverTimer / this.feverDuration) * 400, 20);
 
             if (this.feverTimer <= 0) {
                 this.endFeverMode();
@@ -285,19 +287,23 @@ class GameScene extends Phaser.Scene {
 
     spawnObstacle() {
         if (this.gameState !== 'playing') return;
+        
+        const currentTime = this.time.now;
+        if (currentTime - this.lastSpawnTime < 800) return;
+        this.lastSpawnTime = currentTime;
 
-        const obstacleScale = 0.175;
-        const ceilingHeight = 286 * 0.125;
-        const floorHeight = 286 * 0.125;
-        const gapSize = 180;
+        const obstacleScale = 0.35;
+        const ceilingHeight = 286 * 0.25;
+        const floorHeight = 286 * 0.25;
+        const gapSize = 360;
         const minHeight = ceilingHeight + 50;
         const maxHeight = this.gameHeight - floorHeight - gapSize - 50;
         const height = Phaser.Math.Between(minHeight, maxHeight);
 
         const columnId = 'column_' + Date.now();
 
-        const moveSpeed = this.feverMode ? -400 : -200;
-        const spawnX = this.gameWidth + 200;
+        const moveSpeed = this.feverMode ? -800 : -400;
+        const spawnX = this.gameWidth + 400;
 
         const rocksPerColumn = Math.floor(height / (286 * obstacleScale));
         for (let i = 0; i < rocksPerColumn; i++) {
@@ -306,7 +312,7 @@ class GameScene extends Phaser.Scene {
             topRock.setScale(obstacleScale);
             topRock.body.setSize(300, 286);
             topRock.setVelocityX(moveSpeed);
-            topRock.body.setGravityY(-800);
+            topRock.body.setGravityY(-1600);
             topRock.setDepth(-1);
             topRock.scored = false;
             topRock.columnId = columnId;
@@ -322,7 +328,7 @@ class GameScene extends Phaser.Scene {
             bottomRock.setScale(obstacleScale);
             bottomRock.body.setSize(300, 286);
             bottomRock.setVelocityX(moveSpeed);
-            bottomRock.body.setGravityY(-800);
+            bottomRock.body.setGravityY(-1600);
             bottomRock.setDepth(-1);
             bottomRock.scored = false;
             bottomRock.columnId = columnId;
@@ -333,7 +339,7 @@ class GameScene extends Phaser.Scene {
         extraRock.setScale(obstacleScale);
         extraRock.body.setSize(300, 286);
         extraRock.setVelocityX(moveSpeed);
-        extraRock.body.setGravityY(-800);
+        extraRock.body.setGravityY(-1600);
         extraRock.setDepth(-1);
         extraRock.scored = false;
         extraRock.columnId = columnId;
@@ -345,21 +351,21 @@ class GameScene extends Phaser.Scene {
     }
 
     spawnTorch() {
-        const ceilingHeight = 286 * 0.125;
-        const floorHeight = 286 * 0.125;
-        const torchScale = 0.15;
+        const ceilingHeight = 286 * 0.25;
+        const floorHeight = 286 * 0.25;
+        const torchScale = 0.3;
         const torchHeight = 300 * torchScale;
 
         const minY = ceilingHeight + torchHeight / 2;
         const maxY = this.gameHeight - floorHeight - torchHeight / 2;
         const y = Phaser.Math.Between(minY, maxY);
 
-        const torch = this.torches.create(this.gameWidth + 150, y, 'torch');
+        const torch = this.torches.create(this.gameWidth + 300, y, 'torch');
         torch.setScale(torchScale);
-        const torchMoveSpeed = this.feverMode ? -400 : -200;
+        const torchMoveSpeed = this.feverMode ? -800 : -400;
         torch.setVelocityX(torchMoveSpeed);
         torch.body.setSize(170, 300);
-        torch.body.setGravityY(-800);
+        torch.body.setGravityY(-1600);
 
         const glow = this.add.graphics();
         glow.fillStyle(0xffaa00, 0.3);
@@ -380,22 +386,19 @@ class GameScene extends Phaser.Scene {
         this.physics.overlap(this.player, this.obstacles, this.hitObstacle, null, this);
         this.physics.overlap(this.player, this.torches, this.collectTorch, null, this);
 
-        let columnsToScore = [];
+        let scoredColumns = [];
+        
         this.obstacles.children.entries.forEach(obstacle => {
             if (!obstacle.scored && obstacle.x < this.player.x) {
-                obstacle.scored = true;
-                const columnX = Math.round(obstacle.x / 10) * 10;
-                if (!columnsToScore.includes(columnX)) {
-                    columnsToScore.push(columnX);
+                if (!scoredColumns.includes(obstacle.columnId)) {
+                    scoredColumns.push(obstacle.columnId);
+                    this.score += 1;
+                    this.scoreText.setText('Score: ' + this.score);
+                    this.sounds.success.play();
                 }
+                obstacle.scored = true;
             }
         });
-
-        if (columnsToScore.length > 0) {
-            this.score += columnsToScore.length;
-            this.scoreText.setText('Score: ' + this.score);
-            this.sounds.success.play();
-        }
     }
 
     hitObstacle(player, obstacle) {
@@ -412,11 +415,11 @@ class GameScene extends Phaser.Scene {
     collapseColumn(columnId) {
         this.obstacles.children.entries.forEach(rock => {
             if (rock.columnId === columnId) {
-                rock.body.setGravityY(800);
-                rock.setVelocityX(Phaser.Math.Between(-80, 80));
-                rock.setVelocityY(Phaser.Math.Between(-30, 30));
+                rock.body.setGravityY(1600);
+                rock.setVelocityX(Phaser.Math.Between(-160, 160));
+                rock.setVelocityY(Phaser.Math.Between(-60, 60));
                 rock.body.setBounce(0.1, 0.1);
-                rock.body.setDrag(200);
+                rock.body.setDrag(400);
             }
         });
     }
@@ -441,9 +444,44 @@ class GameScene extends Phaser.Scene {
         this.feverMode = true;
         this.feverTimer = this.feverDuration;
         this.player.setTexture('bat_fever');
-        const feverBatScale = 0.3;
+        const feverBatScale = 0.6;
         this.player.setScale(feverBatScale);
         this.player.body.setSize(400 * feverBatScale * 2, 353 * feverBatScale * 2, true);
+
+        this.obstacles.children.entries.forEach(rock => {
+            if (rock.body.gravity.y <= 0) {
+                rock.setVelocityX(-800);
+            }
+        });
+
+        this.torches.children.entries.forEach(torch => {
+            torch.setVelocityX(-800);
+        });
+
+        this.ceiling.children.entries.forEach(rock => {
+            rock.setVelocityX(-800);
+        });
+
+        this.floor.children.entries.forEach(rock => {
+            rock.setVelocityX(-800);
+        });
+
+        this.obstacleTimer.paused = true;
+        this.feverObstacleTimer.paused = false;
+        this.lastSpawnTime = this.time.now;
+
+        this.feverBar.visible = true;
+        this.feverText.visible = true;
+
+        this.cameras.main.flash(200, 255, 255, 0);
+    }
+
+    endFeverMode() {
+        this.feverMode = false;
+        this.player.setTexture('bat1');
+        const normalBatScale = 0.4;
+        this.player.setScale(normalBatScale);
+        this.player.body.setSize(300 * normalBatScale * 2, 223 * normalBatScale * 2, true);
 
         this.obstacles.children.entries.forEach(rock => {
             if (rock.body.gravity.y <= 0) {
@@ -463,42 +501,9 @@ class GameScene extends Phaser.Scene {
             rock.setVelocityX(-400);
         });
 
-        this.obstacleTimer.paused = true;
-        this.feverObstacleTimer.paused = false;
-
-        this.feverBar.visible = true;
-        this.feverText.visible = true;
-
-        this.cameras.main.flash(200, 255, 255, 0);
-    }
-
-    endFeverMode() {
-        this.feverMode = false;
-        this.player.setTexture('bat1');
-        const normalBatScale = 0.2;
-        this.player.setScale(normalBatScale);
-        this.player.body.setSize(300 * normalBatScale * 2, 223 * normalBatScale * 2, true);
-
-        this.obstacles.children.entries.forEach(rock => {
-            if (rock.body.gravity.y <= 0) {
-                rock.setVelocityX(-200);
-            }
-        });
-
-        this.torches.children.entries.forEach(torch => {
-            torch.setVelocityX(-200);
-        });
-
-        this.ceiling.children.entries.forEach(rock => {
-            rock.setVelocityX(-200);
-        });
-
-        this.floor.children.entries.forEach(rock => {
-            rock.setVelocityX(-200);
-        });
-
         this.obstacleTimer.paused = false;
         this.feverObstacleTimer.paused = true;
+        this.lastSpawnTime = this.time.now;
 
         this.feverBar.visible = false;
         this.feverText.visible = false;
@@ -573,7 +578,7 @@ class GameScene extends Phaser.Scene {
 
         this.add.text(this.gameWidth / 2, this.gameHeight / 2,
             'Game Over\n\nPress R or Click to Restart', {
-            fontSize: '32px',
+            fontSize: '64px',
             fill: '#ffffff',
             fontFamily: 'Arial',
             align: 'center'
@@ -587,8 +592,8 @@ class GameScene extends Phaser.Scene {
 
 const config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: 1600,
+    height: 1200,
     parent: 'gameContainer',
     physics: {
         default: 'arcade',

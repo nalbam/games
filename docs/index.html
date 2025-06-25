@@ -10,44 +10,44 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Arial', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
-        
+
         header {
             text-align: center;
             margin-bottom: 50px;
         }
-        
+
         h1 {
             color: white;
             font-size: 3rem;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        
+
         .subtitle {
             color: rgba(255,255,255,0.9);
             font-size: 1.2rem;
             margin-bottom: 30px;
         }
-        
+
         .games-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
             margin-bottom: 50px;
         }
-        
+
         .game-card {
             background: white;
             border-radius: 15px;
@@ -56,12 +56,12 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             text-align: center;
         }
-        
+
         .game-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
-        
+
         .game-title {
             font-size: 1.8rem;
             color: #333;
@@ -71,34 +71,34 @@
             justify-content: center;
             gap: 10px;
         }
-        
+
         .game-icon {
             font-size: 2rem;
         }
-        
+
         .game-description {
             color: #666;
             line-height: 1.6;
             margin-bottom: 20px;
         }
-        
+
         .game-features {
             list-style: none;
             margin-bottom: 25px;
         }
-        
+
         .game-features li {
             color: #555;
             margin: 5px 0;
             font-size: 0.9rem;
         }
-        
+
         .game-features li::before {
             content: "✓ ";
             color: #4CAF50;
             font-weight: bold;
         }
-        
+
         .play-button {
             display: inline-block;
             background: linear-gradient(45deg, #4CAF50, #45a049);
@@ -111,30 +111,30 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
         }
-        
+
         .play-button:hover {
             background: linear-gradient(45deg, #45a049, #4CAF50);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
         }
-        
+
         .coming-soon {
             background: #f5f5f5;
             border: 2px dashed #ddd;
         }
-        
+
         .coming-soon .play-button {
             background: #ccc;
             cursor: not-allowed;
             box-shadow: none;
         }
-        
+
         .coming-soon .play-button:hover {
             background: #ccc;
             transform: none;
             box-shadow: none;
         }
-        
+
         .status-badge {
             display: inline-block;
             padding: 5px 15px;
@@ -143,35 +143,35 @@
             font-weight: bold;
             margin-bottom: 15px;
         }
-        
+
         .status-completed {
             background: rgba(76, 175, 80, 0.1);
             color: #4CAF50;
             border: 1px solid rgba(76, 175, 80, 0.3);
         }
-        
+
         .status-coming-soon {
             background: rgba(255, 193, 7, 0.1);
             color: #FF9800;
             border: 1px solid rgba(255, 193, 7, 0.3);
         }
-        
+
         footer {
             text-align: center;
             color: rgba(255,255,255,0.8);
             margin-top: 50px;
         }
-        
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2rem;
             }
-            
+
             .games-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
-            
+
             .game-card {
                 padding: 20px;
             }
@@ -184,7 +184,7 @@
             <h1>🎮 Simple Games Collection</h1>
             <p class="subtitle">간단하고 중독성 있는 캐주얼 게임들을 모아둔 프로젝트</p>
         </header>
-        
+
         <div class="games-grid">
             <!-- 완성된 게임 -->
             <div class="game-card">
@@ -204,7 +204,7 @@
                 </ul>
                 <a href="space-dodge/" class="play-button">🎮 지금 플레이하기</a>
             </div>
-            
+
             <div class="game-card">
                 <div class="status-badge status-completed">✅ 완성</div>
                 <h2 class="game-title">
@@ -220,9 +220,9 @@
                     <li>60 FPS 부드러운 애니메이션</li>
                     <li>PC, 모바일 모두 지원</li>
                 </ul>
-                <a href="flappy-bat/" class="play-button">🎮 지금 플레이하기</a>
+                <a href="flappy-bat-phaser/" class="play-button">🎮 지금 플레이하기</a>
             </div>
-            
+
             <!-- 개발 예정 게임들 -->
             <div class="game-card coming-soon">
                 <div class="status-badge status-coming-soon">🚧 개발 예정</div>
@@ -240,7 +240,7 @@
                 </ul>
                 <a href="#" class="play-button">곧 출시 예정</a>
             </div>
-            
+
             <div class="game-card coming-soon">
                 <div class="status-badge status-coming-soon">🚧 개발 예정</div>
                 <h2 class="game-title">
@@ -257,7 +257,7 @@
                 </ul>
                 <a href="#" class="play-button">곧 출시 예정</a>
             </div>
-            
+
             <div class="game-card coming-soon">
                 <div class="status-badge status-coming-soon">🚧 개발 예정</div>
                 <h2 class="game-title">
@@ -274,7 +274,7 @@
                 </ul>
                 <a href="#" class="play-button">곧 출시 예정</a>
             </div>
-            
+
             <div class="game-card coming-soon">
                 <div class="status-badge status-coming-soon">🚧 개발 예정</div>
                 <h2 class="game-title">
@@ -291,7 +291,7 @@
                 </ul>
                 <a href="#" class="play-button">곧 출시 예정</a>
             </div>
-            
+
             <div class="game-card coming-soon">
                 <div class="status-badge status-coming-soon">🚧 개발 예정</div>
                 <h2 class="game-title">
@@ -308,7 +308,7 @@
                 </ul>
                 <a href="#" class="play-button">곧 출시 예정</a>
             </div>
-            
+
             <div class="game-card coming-soon">
                 <div class="status-badge status-coming-soon">🚧 개발 예정</div>
                 <h2 class="game-title">
@@ -325,7 +325,7 @@
                 </ul>
                 <a href="#" class="play-button">곧 출시 예정</a>
             </div>
-            
+
             <div class="game-card coming-soon">
                 <div class="status-badge status-coming-soon">🚧 개발 예정</div>
                 <h2 class="game-title">
@@ -342,7 +342,7 @@
                 </ul>
                 <a href="#" class="play-button">곧 출시 예정</a>
             </div>
-            
+
             <div class="game-card coming-soon">
                 <div class="status-badge status-coming-soon">🚧 개발 예정</div>
                 <h2 class="game-title">
@@ -359,7 +359,7 @@
                 </ul>
                 <a href="#" class="play-button">곧 출시 예정</a>
             </div>
-            
+
             <div class="game-card coming-soon">
                 <div class="status-badge status-coming-soon">🚧 개발 예정</div>
                 <h2 class="game-title">
@@ -377,7 +377,7 @@
                 <a href="#" class="play-button">곧 출시 예정</a>
             </div>
         </div>
-        
+
         <footer>
             <p>간단하지만 재미있는 게임을 만들어보세요! 🎮</p>
             <p style="margin-top: 10px; font-size: 0.9rem;">
