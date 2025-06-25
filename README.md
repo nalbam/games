@@ -24,6 +24,15 @@
 - **플랫폼**: 웹 (PC, 모바일 모두 지원)
 - **[상세 정보](https://nalbam.github.io/games/flappy-bat/)**
 
+#### Flappy Bat - Phaser Edition (박쥐 날기 - Phaser 버전)
+**🎮 [지금 플레이하기](https://nalbam.github.io/games/flappy-bat-phaser/)**
+
+Phaser.js 3 게임 엔진으로 개선된 박쥐 동굴 탐험 게임입니다.
+- **컨셉**: 거리 기반 스폰 시스템과 물리 엔진 기반 장애물 파괴
+- **특징**: 피버 모드, 파티클 이펙트, 완전한 메모리 관리, 반응형 디자인
+- **플랫폼**: 웹 (PC, 모바일 최적화)
+- **[상세 정보](https://nalbam.github.io/games/flappy-bat-phaser/)**
+
 ---
 
 ### 📝 아이디어 목록
