@@ -12,6 +12,7 @@ class GameScene extends Phaser.Scene {
         this.load.image('bat_fever', './images/bat_fever.png');
         this.load.image('rock', './images/rock.png');
         this.load.image('torch', './images/torch.png');
+        this.load.image('game_logo', './images/game.png');
 
         this.load.audio('flap', './sounds/Bat_takeoff.ogg');
         this.load.audio('hit', ['./sounds/Bat_hurt1.ogg', './sounds/Bat_hurt2.ogg', './sounds/Bat_hurt3.ogg']);
@@ -34,13 +35,12 @@ class GameScene extends Phaser.Scene {
 
         this.physics.world.gravity.y = 1600;
 
-        this.createBackground();
-        this.createPlayer();
-        this.createObstacles();
-        this.createUI();
+        this.cameras.main.setBackgroundColor('#1a1a2e');
+        
+        this.particles = this.add.group();
+        
         this.createSounds();
         this.createControls();
-        this.setupCollisions();
 
         this.obstacleTimer = this.time.addEvent({
             delay: 2000,
@@ -171,14 +171,45 @@ class GameScene extends Phaser.Scene {
     }
 
     createStartScreen() {
-        this.startText = this.add.text(this.gameWidth / 2, this.gameHeight / 2,
-            'Flappy Bat\n\nSpace/Click/Touch to Start', {
+        console.log('Creating start screen - gameWidth:', this.gameWidth, 'gameHeight:', this.gameHeight);
+        
+        this.logo = this.add.image(this.gameWidth / 2, this.gameHeight / 2 - 150, 'game_logo');
+        this.logo.setScale(0.5);
+        console.log('Logo created at:', this.logo.x, this.logo.y);
+        
+        this.startButton = this.add.text(this.gameWidth / 2, this.gameHeight / 2 + 100,
+            'START GAME', {
             fontSize: '64px',
             fill: '#ffffff',
             fontFamily: 'Arial',
+            backgroundColor: '#333333',
+            padding: { x: 40, y: 20 }
+        });
+        this.startButton.setOrigin(0.5);
+        this.startButton.setInteractive();
+        console.log('Start button created at:', this.startButton.x, this.startButton.y);
+        
+        this.startButton.on('pointerover', () => {
+            this.startButton.setStyle({ fill: '#ffff00', backgroundColor: '#555555' });
+        });
+        
+        this.startButton.on('pointerout', () => {
+            this.startButton.setStyle({ fill: '#ffffff', backgroundColor: '#333333' });
+        });
+        
+        this.startButton.on('pointerdown', () => {
+            this.startGame();
+        });
+        
+        this.instructionText = this.add.text(this.gameWidth / 2, this.gameHeight / 2 + 200,
+            'Space/Click/Touch to Flap Wings', {
+            fontSize: '32px',
+            fill: '#cccccc',
+            fontFamily: 'Arial',
             align: 'center'
         });
-        this.startText.setOrigin(0.5);
+        this.instructionText.setOrigin(0.5);
+        console.log('Instruction text created at:', this.instructionText.x, this.instructionText.y);
     }
 
     update() {
@@ -206,7 +237,16 @@ class GameScene extends Phaser.Scene {
 
     startGame() {
         this.gameState = 'playing';
-        this.startText.destroy();
+        this.logo.destroy();
+        this.startButton.destroy();
+        this.instructionText.destroy();
+        
+        this.createBackground();
+        this.createPlayer();
+        this.createObstacles();
+        this.createUI();
+        this.setupCollisions();
+        
         this.spawnObstacle();
         this.obstacleTimer.paused = false;
         this.feverObstacleTimer.paused = true;
@@ -529,6 +569,8 @@ class GameScene extends Phaser.Scene {
     }
 
     updateParticles() {
+        if (!this.particles || !this.particles.children) return;
+        
         this.particles.children.entries.forEach(particle => {
             particle.x += particle.velocityX * 0.016;
             particle.y += particle.velocityY * 0.016;
@@ -586,7 +628,40 @@ class GameScene extends Phaser.Scene {
     }
 
     restartGame() {
-        this.scene.restart();
+        this.gameState = 'playing';
+        this.score = 0;
+        this.obstaclesPassed = 0;
+        this.feverMode = false;
+        this.feverTimer = 0;
+        
+        // 기존 게임 객체들 정리
+        this.obstacles.clear(true, true);
+        this.torches.clear(true, true);
+        this.ceiling.clear(true, true);
+        this.floor.clear(true, true);
+        this.particles.clear(true, true);
+        
+        // UI 요소들 정리
+        if (this.scoreText) this.scoreText.destroy();
+        if (this.feverBar) this.feverBar.destroy();
+        if (this.feverText) this.feverText.destroy();
+        
+        // 게임 오버 텍스트 제거
+        this.children.list.forEach(child => {
+            if (child.type === 'Text' && child.text && child.text.includes('Game Over')) {
+                child.destroy();
+            }
+        });
+        
+        this.createBackground();
+        this.createPlayer();
+        this.createUI();
+        
+        this.spawnObstacle();
+        this.obstacleTimer.paused = false;
+        this.feverObstacleTimer.paused = true;
+        this.player.setVelocityY(-600);
+        this.sounds.flap.play();
     }
 }
 
