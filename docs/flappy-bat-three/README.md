@@ -1,94 +1,79 @@
-# Flappy Bat
+# Flappy Bat 3D
 
 <div align="center">
-  <a href="https://nalbam.github.io/flappy-bat/">
-    <img src="./docs/images/game.png" alt="Flappy Bat Logo" width="300">
+  <a href="https://nalbam.github.io/games/flappy-bat-three/">
+    <img src="./images/game.png" alt="Flappy Bat 3D Logo" width="300">
   </a>
   <br>
-  <a href="https://nalbam.github.io/flappy-bat/">🎮 Play Game</a>
+  <a href="https://nalbam.github.io/games/flappy-bat-three/">🎮 게임 플레이</a>
 </div>
 
-A simple flappy bat game built with HTML5 Canvas and JavaScript.
+Three.js로 구현된 3D 플래피 배트 게임입니다.
 
-*Created with Amazon Q Developer - AI-powered coding assistant*
+*Claude Code - AI 코딩 어시스턴트로 제작*
 
-## Game Overview
+## 게임 개요
 
-- **Genre**: Side-scrolling 2D Arcade with Power-ups
-- **Character**: Bat with multiple forms (Normal, Fever, Dead)
-- **Controls**: SPACEBAR/Click/Touch → Flap wings (fly up)
-- **Physics**: Realistic gravity and momentum-based flight
-- **Obstacles**: Destructible rock pillars with physics
-- **Environment**: Moving rocky cave with dynamic effects
-- **Special Features**: Fever Mode with torch collection system
-- **Performance**: 60 FPS locked across all platforms
+- **장르**: 3D 횡스크롤 아케이드 게임
+- **캐릭터**: 날개를 펄럭이는 3D 박쥐
+- **조작법**: 클릭/터치/스페이스바 → 날개 펄럭이기 (위로 날기)
+- **물리 엔진**: 현실적인 중력과 관성 기반 비행
+- **장애물**: 3D 원통형 파이프 장애물
+- **환경**: 3D 동굴 환경과 안개 효과
+- **특별 기능**: 3D 모델링과 그림자 효과
+- **성능**: 모든 플랫폼에서 부드러운 60 FPS
 
-## How to Play
+## 게임 플레이 방법
 
-### 🎮 Controls
-- **Desktop**: SPACEBAR or Click to flap wings
-- **Mobile**: Touch screen to flap wings
-- **Restart**: Press R key or Click/Touch after game over
+### 🎮 조작법
+- **데스크톱**: 스페이스바 또는 클릭으로 날개 펄럭이기
+- **모바일**: 화면 터치로 날개 펄럭이기
+- **재시작**: 게임 오버 후 클릭/터치로 재시작
 
-### 🎯 Gameplay
-1. **Start Game**: Press SPACEBAR, Click, or Touch to begin
-2. **Control Bat**:
-   - Press SPACEBAR, Click, or Touch to flap wings and fly up
-   - Release to let gravity pull the bat down
-3. **Navigate Obstacles**: Fly through gaps between destructible rock pillars
-4. **Collect Torches**: Every 10 obstacles passed spawns a torch at random location
-5. **Activate Fever Mode**: Touch a torch to become a giant, invincible bat
-6. **Fever Mode Powers**:
-   - 2x larger size (giant bat)
-   - 4x faster speed (ultra-fast movement)
-   - Invincible to rock collisions (destroy rocks instead)
-   - 5-second duration with timer bar
-7. **Score Points**: Each obstacle passed increases your score
-8. **Game Over**: Collision with rocks, ceiling, or floor ends the game (except in Fever Mode)
-9. **Restart**: Use R key or click Restart button to play again
+### 🎯 게임플레이
+1. **게임 시작**: 스페이스바, 클릭 또는 터치로 게임 시작
+2. **박쥐 조작**:
+   - 스페이스바, 클릭 또는 터치로 날개를 펄럭여 위로 날기
+   - 놓으면 중력에 의해 아래로 떨어짐
+3. **장애물 피하기**: 3D 파이프 사이의 틈을 통과하며 날아가기
+4. **점수 획득**: 각 장애물을 통과할 때마다 점수 증가
+5. **게임 오버**: 파이프, 천장, 바닥과 충돌하면 게임 종료
+6. **재시작**: 게임 오버 후 클릭하여 다시 시작
 
-### 📱 Mobile Optimized
-- Responsive design works on all devices
-- Touch controls for smartphones and tablets
-- Optimized performance for iOS and Android
-- Full-screen gameplay experience
+### 📱 모바일 최적화
+- 모든 기기에서 작동하는 반응형 디자인
+- 스마트폰과 태블릿을 위한 터치 조작
+- iOS와 Android에 최적화된 성능
+- 전체 화면 게임플레이 경험
 
-## Game Features
+## 게임 특징
 
-### 🎮 Core Gameplay
-- **Fullscreen Display**: Responsive design that fills the entire browser window
-- **Cross-Platform Performance**: 60 FPS locked on Windows, Mac, iOS, and Android
-- **Advanced Physics**: Gravity, momentum, and realistic object destruction
-- **Multiple Bat Forms**: Normal (2 animations), Fever (giant), and Death states
-- **Progressive Difficulty**: Obstacles become more challenging over time
+### 🎮 핵심 게임플레이
+- **전체 화면 디스플레이**: 브라우저 창을 가득 채우는 반응형 디자인
+- **크로스 플랫폼 성능**: Windows, Mac, iOS, Android에서 60 FPS 고정
+- **고급 3D 물리**: Three.js 기반 중력, 관성, 3D 충돌 감지
+- **3D 박쥐 모델**: 날개와 몸체를 가진 3D 박쥐 캐릭터
+- **동적 3D 환경**: 안개 효과와 조명이 있는 3D 동굴
 
-### 🔥 Fever Mode System
-- **Torch Collection**: Spawns every 10 obstacles at random locations
-- **Giant Bat Transformation**: 2x size increase with fever sprite
-- **Super Speed**: 4x movement speed (24 vs 6 pixels/frame)
-- **Invincibility**: Destroy rocks instead of dying on collision
-- **Visual Feedback**: "FEVER MODE!" text and countdown timer bar
-- **Duration**: 5-second power-up with real-time timer
+### 🎨 시각적 & 오디오 효과
+- **3D 애니메이션**: 실시간 날개 펄럭임 애니메이션
+- **3D 장애물**: 원통형 파이프와 캡이 있는 3D 장애물
+- **그림자 효과**: 실시간 그림자 매핑과 조명 효과
+- **몰입형 오디오**: 날개 소리, 충돌음, 효과음
+- **카메라 추적**: 박쥐를 따라가는 부드러운 카메라 움직임
+- **반응형 UI**: 점수 표시와 게임 상태 인터페이스
 
-### 🎨 Visual & Audio
-- **Dynamic Animations**: Wing flapping responds to movement and input
-- **Destructible Environment**: Rocks break into physics-based pieces
-- **Realistic Destruction**: Rock pieces fall, bounce, and settle naturally
-- **Immersive Audio**: Wing flaps, collisions, explosions, and power-up sounds
-- **Visual Effects**: Glowing torch effects and fever mode indicators
-- **Responsive UI**: Restart button, score display, and fever mode status
+### 🛠️ 기술적 특징
+- **Three.js 엔진**: 최신 WebGL 기반 3D 렌더링
+- **실시간 3D 렌더링**: 60 FPS 3D 그래픽
+- **정밀한 3D 충돌**: 3D 바운딩 박스 충돌 감지
+- **모바일 최적화**: iOS와 Android를 위한 성능 튜닝
+- **오디오 시스템**: 성능 최적화된 사운드 시스템
+- **메모리 관리**: 효율적인 3D 객체 관리와 정리
 
-### 🛠️ Technical Features
-- **Asset Loading**: Safe image loading with progress indicator
-- **Debug Mode**: Visual collision area display (disabled by default)
-- **Precise Collision**: Accurate detection matching visual boundaries
-- **Mobile Optimization**: Performance tuning for iOS and Android
-- **Audio Throttling**: Performance-optimized sound system
-- **Memory Management**: Efficient object pooling and cleanup
+## 게임 에셋
 
-## Game Assets
-
-### Images
+### 이미지
 - **박쥐 스프라이트**:
   - [bat1.png](./images/bat1.png) - 날개 펼친 상태 (300x223) - 활공/낙하
   - [bat2.png](./images/bat2.png) - 날개 접은 상태 (300x223) - 점프/펄럭임
@@ -100,46 +85,44 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
   - [rock.png](./images/rock.png) - 파괴 가능한 바위 텍스처 (300x286)
   - [game.png](./images/game.png) - 게임 로고 (1024x1024)
 
-### Sound Effects
-- **Wing Flap**: [Bat_takeoff.ogg](./sounds/Bat_takeoff.ogg) - Jump/flap sound
-- **Power-up Sounds**: Bat_idle1-4.ogg (4 variations) - Torch collection & game start
-- **Collision Sounds**: Bat_hurt1-3.ogg (3 variations) - Rock collision damage
-- **Destruction Effects**: Explosion1-4.ogg (4 variations) - Rock breaking sounds
+### 사운드 효과
+- **날개 소리**: [Bat_takeoff.ogg](./sounds/Bat_takeoff.ogg) - 점프/펄럭임 소리
+- **파워업 사운드**: Bat_idle1-4.ogg (4가지 변형) - 토치 수집 및 게임 시작
+- **충돌 사운드**: Bat_hurt1-3.ogg (3가지 변형) - 바위 충돌 피해
+- **파괴 효과**: Explosion1-4.ogg (4가지 변형) - 바위 파괴 소리
 
-## Source Code
+## 소스 코드
 
-- **Game Logic**: [game.js](./game.js) - Main game engine with physics, collision detection, and rendering
-- **HTML Page**: [index.html](./index.html) - Responsive web page with mobile optimization
+- **게임 로직**: [game.js](./game.js) - Three.js 기반 3D 게임 엔진과 물리, 충돌 감지, 렌더링
+- **HTML 페이지**: [index.html](./index.html) - 모바일 최적화된 반응형 웹 페이지
 
-## How to Run
+## 실행 방법
 
-### 🌐 Play Online
-Visit: **https://nalbam.github.io/flappy-bat/**
+### 🌐 온라인으로 플레이
+방문: **https://nalbam.github.io/games/flappy-bat-three/**
 
-### 💻 Run Locally
-1. Clone this repository
-2. Open `docs/flappy-bat/index.html` in a web browser
-3. Press SPACEBAR, Click, or Touch to start playing
-4. Enjoy the game!
+### 💻 로컬에서 실행
+1. 이 저장소를 클론하세요
+2. 웹 브라우저에서 `docs/flappy-bat-three/index.html`를 열어주세요
+3. 스페이스바, 클릭 또는 터치로 게임을 시작하세요
+4. 게임을 즐기세요!
 
-## Game Mechanics
+## 게임 메커니즘
 
-### Basic Physics
-- **Screen Size**: 1600x1200 pixels (high-resolution, fullscreen display)
-- **Bat Sizes**:
-  - Normal: 121x90 pixels (bat1/bat2)
-  - Dead: 85x90 pixels (bat_dead)
-  - Fever: 204x180 pixels (bat_fever - 2x larger)
-- **Jump Force**: -16 velocity units
-- **Gravity**: 1.0 acceleration per frame (bat), 0.3 (rock pieces)
-- **Movement Speeds**:
-  - Normal: 6 pixels per frame
-  - Fever Mode: 24 pixels per frame (4x faster)
-- **Rock Specifications**:
-  - Width: 160 pixels
-  - Gap: 360 pixels between rock pillars
-  - Spawn Rate: Every 90 frames (~1.5 seconds at 60 FPS)
-- **Cave Boundaries**: 60px ceiling and floor collision zones
+### 기본 3D 물리
+- **화면 크기**: 전체 화면 (반응형 3D 뷰포트)
+- **박쥐 3D 모델**:
+  - 몸체: 0.3 x 0.2 x 0.1 단위 (3D 박스)
+  - 날개: 0.15 x 0.05 x 0.3 단위 (좌우 각각)
+- **점프력**: 0.04 속도 단위
+- **중력**: -0.002 가속도 (프레임당)
+- **게임 속도**: 0.02 단위 (프레임당)
+- **파이프 규격**:
+  - 반지름: 0.3 단위
+  - 높이: 5 단위
+  - 간격: 4 단위 (파이프 사이)
+  - 생성 간격: 2 단위 갭
+- **3D 경계**: 위아래 4 단위 제한
 
 ### Fever Mode Mechanics
 - **Activation**: Collect torch (spawns every 10 obstacles)
@@ -268,4 +251,4 @@ This game was developed using **Claude Code**, an AI-powered coding assistant th
 - **Bat Animation System**: Dynamic wing animations with accurate aspect ratios
 - **Physics Engine**: Realistic rock destruction with individual piece physics
 - **Audio System**: Immersive sound effects with mobile optimization
-- **Cross-Platform Support**: Universal compatibility with performance optimization
+- **크로스 플랫폼 지원**: 성능 최적화를 통한 범용 호환성
