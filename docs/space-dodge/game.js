@@ -164,18 +164,27 @@ class SpaceDodgeGame {
     updateTouchPosition(touch) {
         if (!this.player || this.gameState !== 'playing') return;
         
-        // Convert screen coordinates to world coordinates
+        // Get screen coordinates relative to canvas
         const rect = this.renderer.domElement.getBoundingClientRect();
         const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
         const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
         
-        // Convert normalized coordinates to world space
-        const worldX = x * 7; // Map to game world bounds (-7 to 7)
-        const worldY = y * 4.5; // Map to game world bounds (-4.5 to 4.5)
+        // Create a vector for the touch position in normalized device coordinates
+        const vector = new THREE.Vector3(x, y, 0.5);
         
-        // Smoothly move player to touch position
-        this.player.position.x = Math.max(-7, Math.min(7, worldX));
-        this.player.position.y = Math.max(-5, Math.min(4, worldY));
+        // Unproject the vector to get world coordinates
+        vector.unproject(this.camera);
+        
+        // Calculate the direction from camera to the unprojected point
+        const dir = vector.sub(this.camera.position).normalize();
+        
+        // Calculate where the ray intersects the z=0 plane (where the player moves)
+        const distance = -this.camera.position.z / dir.z;
+        const worldPos = this.camera.position.clone().add(dir.multiplyScalar(distance));
+        
+        // Move player to touch position with bounds checking
+        this.player.position.x = Math.max(-7, Math.min(7, worldPos.x));
+        this.player.position.y = Math.max(-5, Math.min(4, worldPos.y));
     }
     
     updatePlayer() {
