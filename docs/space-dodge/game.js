@@ -19,6 +19,11 @@ class SpaceDodgeGame {
             down: false
         };
         
+        // Touch controls
+        this.touchStart = { x: 0, y: 0 };
+        this.touchCurrent = { x: 0, y: 0 };
+        this.isTouching = false;
+        
         this.init();
         this.setupControls();
         this.animate();
@@ -59,7 +64,7 @@ class SpaceDodgeGame {
         const material = new THREE.MeshLambertMaterial({ color: 0x00aaff });
         this.player = new THREE.Mesh(geometry, material);
         this.player.position.set(0, -4, 0);
-        this.player.rotation.z = Math.PI; // Point upward
+        // Point upward (no rotation needed, cone already points up by default)
         this.scene.add(this.player);
     }
     
@@ -109,6 +114,11 @@ class SpaceDodgeGame {
                 case 'KeyS':
                     this.keys.down = true;
                     break;
+                case 'Enter':
+                    if (this.gameState === 'gameOver') {
+                        this.restart();
+                    }
+                    break;
             }
         });
         
@@ -132,12 +142,53 @@ class SpaceDodgeGame {
                     break;
             }
         });
+        
+        // Touch controls
+        this.renderer.domElement.addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            const touch = event.touches[0];
+            this.touchStart.x = touch.clientX;
+            this.touchStart.y = touch.clientY;
+            this.touchCurrent.x = touch.clientX;
+            this.touchCurrent.y = touch.clientY;
+            this.isTouching = true;
+        });
+        
+        this.renderer.domElement.addEventListener('touchmove', (event) => {
+            event.preventDefault();
+            if (this.isTouching) {
+                const touch = event.touches[0];
+                this.touchCurrent.x = touch.clientX;
+                this.touchCurrent.y = touch.clientY;
+            }
+        });
+        
+        this.renderer.domElement.addEventListener('touchend', (event) => {
+            event.preventDefault();
+            this.isTouching = false;
+            this.keys.left = false;
+            this.keys.right = false;
+            this.keys.up = false;
+            this.keys.down = false;
+        });
     }
     
     updatePlayer() {
         if (!this.player) return;
         
         const moveSpeed = 0.2;
+        
+        // Handle touch input
+        if (this.isTouching) {
+            const deltaX = this.touchCurrent.x - this.touchStart.x;
+            const deltaY = this.touchCurrent.y - this.touchStart.y;
+            
+            // Convert touch movement to movement keys
+            this.keys.left = deltaX < -20;
+            this.keys.right = deltaX > 20;
+            this.keys.up = deltaY < -20;
+            this.keys.down = deltaY > 20;
+        }
         
         if (this.keys.left && this.player.position.x > -7) {
             this.player.position.x -= moveSpeed;
