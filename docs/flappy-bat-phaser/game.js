@@ -31,6 +31,10 @@ class GameScene extends Phaser.Scene {
         this.obstaclesPassed = 0;
         this.distance = 0;
         this.gameStartTime = 0;
+        this.lastObstacleDistance = 0;
+        this.lastTorchDistance = 0;
+        this.obstacleInterval = 15;
+        this.torchInterval = 150;
         this.feverMode = false;
         this.feverTimer = 0;
         this.feverDuration = 10000;
@@ -44,22 +48,6 @@ class GameScene extends Phaser.Scene {
         this.createSounds();
         this.createControls();
 
-        this.obstacleTimer = this.time.addEvent({
-            delay: 2000,
-            callback: this.spawnObstacle,
-            callbackScope: this,
-            loop: true,
-            paused: true
-        });
-
-        this.feverObstacleTimer = this.time.addEvent({
-            delay: 1000,
-            callback: this.spawnObstacle,
-            callbackScope: this,
-            loop: true,
-            paused: true
-        });
-        
         this.lastSpawnTime = 0;
 
         this.createStartScreen();
@@ -230,6 +218,7 @@ class GameScene extends Phaser.Scene {
             this.updateObstacles();
             this.updateFever();
             this.updateDistance();
+            this.checkSpawning();
             this.checkCollisions();
 
             if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
@@ -248,6 +237,8 @@ class GameScene extends Phaser.Scene {
         this.gameState = 'playing';
         this.gameStartTime = this.time.now;
         this.distance = 0;
+        this.lastObstacleDistance = 0;
+        this.lastTorchDistance = 0;
         this.logo.destroy();
         this.startButton.destroy();
         this.instructionText.destroy();
@@ -258,9 +249,6 @@ class GameScene extends Phaser.Scene {
         this.createUI();
         this.setupCollisions();
         
-        this.spawnObstacle();
-        this.obstacleTimer.paused = false;
-        this.feverObstacleTimer.paused = true;
         this.player.setVelocityY(-600);
         this.sounds.flap.play();
     }
@@ -298,6 +286,18 @@ class GameScene extends Phaser.Scene {
             const pixelsPerMeter = 50;
             this.distance = Math.floor(gameTime * baseSpeed / pixelsPerMeter);
             this.distanceText.setText('Distance: ' + this.distance + 'm');
+        }
+    }
+    
+    checkSpawning() {
+        if (this.distance - this.lastObstacleDistance >= this.obstacleInterval) {
+            this.spawnObstacle();
+            this.lastObstacleDistance = this.distance;
+        }
+        
+        if (this.distance - this.lastTorchDistance >= this.torchInterval) {
+            this.spawnTorch();
+            this.lastTorchDistance = this.distance;
         }
     }
 
@@ -406,9 +406,6 @@ class GameScene extends Phaser.Scene {
         extraRock.columnId = columnId;
 
         this.obstaclesPassed++;
-        if (this.obstaclesPassed % 10 === 0) {
-            this.spawnTorch();
-        }
     }
 
     spawnTorch() {
@@ -488,8 +485,6 @@ class GameScene extends Phaser.Scene {
     destroyObstacle(obstacle) {
         this.createExplosion(obstacle.x, obstacle.y);
         obstacle.destroy();
-        this.score += 1;
-        this.scoreText.setText('Score: ' + this.score);
     }
 
     collectTorch(player, torch) {
@@ -527,9 +522,7 @@ class GameScene extends Phaser.Scene {
             rock.setVelocityX(-800);
         });
 
-        this.obstacleTimer.paused = true;
-        this.feverObstacleTimer.paused = false;
-        this.lastSpawnTime = this.time.now;
+        // 피버모드에서도 동일한 간격 유지
 
         this.feverBar.visible = true;
         this.feverText.visible = true;
@@ -562,9 +555,7 @@ class GameScene extends Phaser.Scene {
             rock.setVelocityX(-400);
         });
 
-        this.obstacleTimer.paused = false;
-        this.feverObstacleTimer.paused = true;
-        this.lastSpawnTime = this.time.now;
+        // 피버모드 종료 시에도 동일한 간격 유지
 
         this.feverBar.visible = false;
         this.feverText.visible = false;
@@ -615,8 +606,6 @@ class GameScene extends Phaser.Scene {
 
         this.player.setTexture('bat_dead');
         this.player.setVelocityX(0);
-        this.obstacleTimer.paused = true;
-        this.feverObstacleTimer.paused = true;
 
         this.obstacles.children.entries.forEach(rock => {
             if (rock.body.gravity.y <= 0) {
@@ -654,6 +643,10 @@ class GameScene extends Phaser.Scene {
         this.obstaclesPassed = 0;
         this.distance = 0;
         this.gameStartTime = this.time.now;
+        this.lastObstacleDistance = 0;
+        this.lastTorchDistance = 0;
+        this.obstacleInterval = 15;
+        this.torchInterval = 150;
         this.feverMode = false;
         this.feverTimer = 0;
         this.lastSpawnTime = 0;
@@ -730,32 +723,12 @@ class GameScene extends Phaser.Scene {
             }
         });
         
-        // 타이머 재생성
-        this.obstacleTimer = this.time.addEvent({
-            delay: 2000,
-            callback: this.spawnObstacle,
-            callbackScope: this,
-            loop: true,
-            paused: true
-        });
-
-        this.feverObstacleTimer = this.time.addEvent({
-            delay: 1000,
-            callback: this.spawnObstacle,
-            callbackScope: this,
-            loop: true,
-            paused: true
-        });
-        
         // 게임 재시작
         this.createBackground();
         this.createPlayer();
         this.createUI();
         this.setupCollisions();
         
-        this.spawnObstacle();
-        this.obstacleTimer.paused = false;
-        this.feverObstacleTimer.paused = true;
         this.player.setVelocityY(-600);
         this.sounds.flap.play();
     }
