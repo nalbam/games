@@ -32,13 +32,13 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 
 ### 🎯 Gameplay
 1. **Start Game**: Press SPACEBAR, Click, or Touch to begin
-2. **Control Bat**: 
+2. **Control Bat**:
    - Press SPACEBAR, Click, or Touch to flap wings and fly up
    - Release to let gravity pull the bat down
 3. **Navigate Obstacles**: Fly through gaps between destructible rock pillars
 4. **Collect Torches**: Every 10 obstacles passed spawns a torch at random location
 5. **Activate Fever Mode**: Touch a torch to become a giant, invincible bat
-6. **Fever Mode Powers**: 
+6. **Fever Mode Powers**:
    - 2x larger size (giant bat)
    - 4x faster speed (ultra-fast movement)
    - Invincible to rock collisions (destroy rocks instead)
@@ -89,7 +89,7 @@ A simple flappy bat game built with HTML5 Canvas and JavaScript.
 ## Game Assets
 
 ### Images
-- **Bat Animation Sprites**: 
+- **Bat Animation Sprites**:
   - [bat1.png](./images/bat1.png) - Wings spread (300x223) - Gliding/falling
   - [bat2.png](./images/bat2.png) - Wings folded (300x223) - Jumping/flapping
   - [bat_dead.png](./images/bat_dead.png) - Dead state (300x317) - Game over
@@ -126,16 +126,16 @@ Visit: **https://nalbam.github.io/flappy-bat/**
 
 ### Basic Physics
 - **Screen Size**: 1600x1200 pixels (high-resolution, fullscreen display)
-- **Bat Sizes**: 
+- **Bat Sizes**:
   - Normal: 121x90 pixels (bat1/bat2)
   - Dead: 85x90 pixels (bat_dead)
   - Fever: 204x180 pixels (bat_fever - 2x larger)
 - **Jump Force**: -16 velocity units
 - **Gravity**: 1.0 acceleration per frame (bat), 0.3 (rock pieces)
-- **Movement Speeds**: 
+- **Movement Speeds**:
   - Normal: 6 pixels per frame
   - Fever Mode: 24 pixels per frame (4x faster)
-- **Rock Specifications**: 
+- **Rock Specifications**:
   - Width: 160 pixels
   - Gap: 360 pixels between rock pillars
   - Spawn Rate: Every 90 frames (~1.5 seconds at 60 FPS)
@@ -163,7 +163,7 @@ Visit: **https://nalbam.github.io/flappy-bat/**
 - **Rock Destruction**: Individual 90-pixel rock pieces with realistic physics
 - **Normal Mode**: Collision with rocks causes game over + rock destruction
 - **Fever Mode**: Collision destroys rocks but bat continues (invincible)
-- **Rock Physics**: 
+- **Rock Physics**:
   - Top rocks: Fall and scatter on collision
   - Bottom rocks: Tip over in collision direction
   - Ground settling: Pieces settle on cave floor (60px from bottom)
@@ -246,11 +246,11 @@ This game was developed using **Claude Code**, an AI-powered coding assistant th
   - Invincibility to rock collisions with destruction effects
   - Visual timer bar and "FEVER MODE!" display
   - 5-second duration with real-time countdown
-- **🎨 New Visual Assets**: 
+- **🎨 New Visual Assets**:
   - bat_fever.png (400x353) - Giant fever mode sprite
   - bat_dead.png (300x317) - Renamed from batx with proper scaling
   - torch.png (170x300) - Power-up collectible item
-- **⚡ Enhanced Performance**: 
+- **⚡ Enhanced Performance**:
   - 60 FPS locked frame rate across all platforms (Windows, Mac, iOS, Android)
   - Advanced audio throttling system (50ms) for mobile optimization
   - Improved collision detection with dynamic bat sizing
