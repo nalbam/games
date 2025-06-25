@@ -17,6 +17,9 @@ class SpaceDodgeGame {
         this.collisionTime = 0;
         this.explosionParticles = [];
         
+        // Space dust particles
+        this.spaceDust = [];
+        
         this.keys = {
             left: false,
             right: false,
@@ -57,6 +60,9 @@ class SpaceDodgeGame {
         // Create player
         this.createPlayer();
         
+        // Create space dust
+        this.createSpaceDust();
+        
         // Handle window resize
         window.addEventListener('resize', () => this.onWindowResize());
     }
@@ -69,6 +75,46 @@ class SpaceDodgeGame {
         this.player.position.set(0, -4, 0);
         // Point upward (no rotation needed, cone already points up by default)
         this.scene.add(this.player);
+    }
+    
+    createSpaceDust() {
+        for (let i = 0; i < 100; i++) {
+            const geometry = new THREE.SphereGeometry(0.02, 4, 4);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0xffffff,
+                transparent: true,
+                opacity: Math.random() * 0.8 + 0.2
+            });
+            const dust = new THREE.Mesh(geometry, material);
+            
+            dust.position.set(
+                (Math.random() - 0.5) * 30,
+                Math.random() * 20 + 10,
+                (Math.random() - 0.5) * 20
+            );
+            
+            dust.originalZ = dust.position.z;
+            dust.speed = Math.random() * 0.05 + 0.02;
+            dust.twinkle = Math.random() * Math.PI * 2;
+            
+            this.scene.add(dust);
+            this.spaceDust.push(dust);
+        }
+    }
+    
+    updateSpaceDust() {
+        this.spaceDust.forEach(dust => {
+            dust.position.y -= dust.speed + this.speed * 2;
+            
+            dust.twinkle += 0.1;
+            dust.material.opacity = (Math.sin(dust.twinkle) * 0.3 + 0.7) * 0.6;
+            
+            if (dust.position.y < -10) {
+                dust.position.y = 15;
+                dust.position.x = (Math.random() - 0.5) * 30;
+                dust.position.z = dust.originalZ + (Math.random() - 0.5) * 5;
+            }
+        });
     }
     
     createObstacle() {
@@ -376,6 +422,12 @@ class SpaceDodgeGame {
         this.explosionParticles.forEach(particle => this.scene.remove(particle));
         this.explosionParticles = [];
         
+        // Reset space dust
+        this.spaceDust.forEach(dust => {
+            dust.position.y = Math.random() * 20 + 10;
+            dust.position.x = (Math.random() - 0.5) * 30;
+        });
+        
         // Reset collision state
         this.isColliding = false;
         this.collisionTime = 0;
@@ -401,7 +453,8 @@ class SpaceDodgeGame {
             this.obstacleSpawnRate += 0.00001;
         }
         
-        // Always update collision animation
+        // Always update space dust and collision animation
+        this.updateSpaceDust();
         this.updateCollisionAnimation();
     }
     
