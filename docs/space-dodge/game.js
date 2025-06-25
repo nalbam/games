@@ -20,8 +20,6 @@ class SpaceDodgeGame {
         };
         
         // Touch controls
-        this.touchStart = { x: 0, y: 0 };
-        this.touchCurrent = { x: 0, y: 0 };
         this.isTouching = false;
         
         this.init();
@@ -143,64 +141,62 @@ class SpaceDodgeGame {
             }
         });
         
-        // Touch controls
+        // Touch controls - direct position mapping
         this.renderer.domElement.addEventListener('touchstart', (event) => {
             event.preventDefault();
-            const touch = event.touches[0];
-            this.touchStart.x = touch.clientX;
-            this.touchStart.y = touch.clientY;
-            this.touchCurrent.x = touch.clientX;
-            this.touchCurrent.y = touch.clientY;
             this.isTouching = true;
+            this.updateTouchPosition(event.touches[0]);
         });
         
         this.renderer.domElement.addEventListener('touchmove', (event) => {
             event.preventDefault();
             if (this.isTouching) {
-                const touch = event.touches[0];
-                this.touchCurrent.x = touch.clientX;
-                this.touchCurrent.y = touch.clientY;
+                this.updateTouchPosition(event.touches[0]);
             }
         });
         
         this.renderer.domElement.addEventListener('touchend', (event) => {
             event.preventDefault();
             this.isTouching = false;
-            this.keys.left = false;
-            this.keys.right = false;
-            this.keys.up = false;
-            this.keys.down = false;
         });
+    }
+    
+    updateTouchPosition(touch) {
+        if (!this.player || this.gameState !== 'playing') return;
+        
+        // Convert screen coordinates to world coordinates
+        const rect = this.renderer.domElement.getBoundingClientRect();
+        const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
+        const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
+        
+        // Convert normalized coordinates to world space
+        const worldX = x * 7; // Map to game world bounds (-7 to 7)
+        const worldY = y * 4.5; // Map to game world bounds (-4.5 to 4.5)
+        
+        // Smoothly move player to touch position
+        this.player.position.x = Math.max(-7, Math.min(7, worldX));
+        this.player.position.y = Math.max(-5, Math.min(4, worldY));
     }
     
     updatePlayer() {
         if (!this.player) return;
         
-        const moveSpeed = 0.2;
-        
-        // Handle touch input
-        if (this.isTouching) {
-            const deltaX = this.touchCurrent.x - this.touchStart.x;
-            const deltaY = this.touchCurrent.y - this.touchStart.y;
+        // Only handle keyboard input (touch is handled directly in updateTouchPosition)
+        if (!this.isTouching) {
+            const moveSpeed = 0.2;
             
-            // Convert touch movement to movement keys
-            this.keys.left = deltaX < -20;
-            this.keys.right = deltaX > 20;
-            this.keys.up = deltaY < -20;
-            this.keys.down = deltaY > 20;
-        }
-        
-        if (this.keys.left && this.player.position.x > -7) {
-            this.player.position.x -= moveSpeed;
-        }
-        if (this.keys.right && this.player.position.x < 7) {
-            this.player.position.x += moveSpeed;
-        }
-        if (this.keys.up && this.player.position.y < 4) {
-            this.player.position.y += moveSpeed;
-        }
-        if (this.keys.down && this.player.position.y > -5) {
-            this.player.position.y -= moveSpeed;
+            if (this.keys.left && this.player.position.x > -7) {
+                this.player.position.x -= moveSpeed;
+            }
+            if (this.keys.right && this.player.position.x < 7) {
+                this.player.position.x += moveSpeed;
+            }
+            if (this.keys.up && this.player.position.y < 4) {
+                this.player.position.y += moveSpeed;
+            }
+            if (this.keys.down && this.player.position.y > -5) {
+                this.player.position.y -= moveSpeed;
+            }
         }
     }
     
