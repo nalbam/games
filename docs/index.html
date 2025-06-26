@@ -205,7 +205,7 @@
                 description: "3D 우주선으로 빨간색 장애물을 피해가는 게임입니다.",
                 features: [
                     "Three.js 3D 그래픽",
-                    "점진적 난이도 증가", 
+                    "점진적 난이도 증가",
                     "생명 시스템과 점수",
                     "WASD/방향키 조작"
                 ],
@@ -239,7 +239,7 @@
             {
                 title: "Color Gate",
                 icon: "🌈",
-                status: "coming-soon", 
+                status: "coming-soon",
                 description: "색상 변경으로 특정 색 문만 통과하는 게임",
                 features: [
                     "주기적 색상 변경 시스템",
@@ -306,7 +306,7 @@
                     "타이밍 기반 정확한 액션",
                     "무한 달리기 시스템"
                 ],
-                url: "#"
+                url: "stick-runner/"
             },
             {
                 title: "Tunnel Racer",
@@ -344,21 +344,21 @@
         // 게임 카드 렌더링 함수
         function renderGames() {
             const gamesGrid = document.getElementById('games-grid');
-            
+
             sortedGames.forEach(game => {
                 const gameCard = document.createElement('div');
                 gameCard.className = game.status === 'coming-soon' ? 'game-card coming-soon' : 'game-card';
-                
-                const statusBadge = game.status === 'completed' ? 
+
+                const statusBadge = game.status === 'completed' ?
                     '<div class="status-badge status-completed">✅ 완성</div>' :
                     '<div class="status-badge status-coming-soon">🚧 개발 예정</div>';
-                
+
                 const playButton = game.status === 'completed' ?
                     `<a href="${game.url}" class="play-button">🎮 지금 플레이하기</a>` :
                     '<a href="#" class="play-button">곧 출시 예정</a>';
-                
+
                 const featuresHtml = game.features.map(feature => `<li>${feature}</li>`).join('');
-                
+
                 gameCard.innerHTML = `
                     ${statusBadge}
                     <h2 class="game-title">
@@ -373,7 +373,7 @@
                     </ul>
                     ${playButton}
                 `;
-                
+
                 gamesGrid.appendChild(gameCard);
             });
         }
