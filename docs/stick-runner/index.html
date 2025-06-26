@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stick Runner</title>
+    <title>Robot Runner</title>
     <style>
         body {
             margin: 0;
@@ -102,8 +102,8 @@
         </div>
 
         <div id="instructions">
-            <h2>🏃 Stick Runner</h2>
-            <p>자동으로 달리는 스틱맨을 조종하여 장애물을 피하세요!</p>
+            <h2>🏃 Robot Runner</h2>
+            <p>자동으로 달리는 캐릭터를 조종하여 장애물을 피하세요!</p>
             <div id="controls">
                 <div><span class="control-key">스페이스바</span> 또는 <span class="control-key">위쪽</span> : 점프</div>
                 <div><span class="control-key">아래쪽</span> 또는 <span class="control-key">S</span> : 슬라이드</div>
@@ -120,7 +120,15 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="game.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.177.0/build/three.module.js",
+          "GLTFLoader": "https://unpkg.com/three@0.177.0/examples/jsm/loaders/GLTFLoader.js",
+          "OrbitControls": "https://unpkg.com/three@0.177.0/examples/jsm/controls/OrbitControls.js"
+        }
+      }
+    </script>
+    <script type="module" src="game.js"></script>
 </body>
 </html>
