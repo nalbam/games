@@ -1,36 +1,220 @@
 # Stick Runner
 
-Three.js로 구현한 3D 자동 달리기 게임입니다.
+<div align="center">
+  <h2>🏃 3D Endless Runner Game 🏃</h2>
+  <p><strong>Three.js로 구현한 3D 자동 달리기 게임</strong></p>
+  <br>
+  <a href="#">🎮 Play Game</a> | <a href="#how-to-run">💻 Run Locally</a>
+</div>
 
-## 게임 방법
+A 3D endless runner game built with Three.js featuring automatic running, jump/slide mechanics, and progressive difficulty.
 
-- **점프**: 스페이스바, 위쪽 화살표, W키
-- **슬라이드**: 아래쪽 화살표, S키
-- **모바일**: 화면 위쪽 터치(점프), 아래쪽 터치(슬라이드)
+*Game implementation in progress - MVP documentation ready*
 
-## 게임 특징
+## Game Overview
 
-- 자동으로 달리는 스틱맨 캐릭터
-- 점프와 슬라이드로 장애물 회피
-- 거리에 따른 점진적 속도 증가
-- 3D 그래픽과 그림자 효과
-- 파티클 효과 (먼지)
-- 배경 패럴랙스 스크롤링
-- 모바일 터치 지원
+- **Genre**: 3D Endless Runner with Progressive Difficulty
+- **Character**: Animated stick figure runner with jump/slide animations
+- **Environment**: Infinite 3D running track with dynamic obstacles
+- **Mechanics**: Automatic running with manual obstacle avoidance
+- **Performance**: Optimized for 60 FPS across all platforms
 
-## 기술 스택
+## How to Play
 
-- Three.js (r128)
-- WebGL
-- JavaScript ES6+
+### 🎮 Controls
+- **Desktop**: 
+  - **Jump**: SPACEBAR, ↑ Arrow Key, W Key
+  - **Slide**: ↓ Arrow Key, S Key
+- **Mobile**: 
+  - **Jump**: Touch upper half of screen
+  - **Slide**: Touch lower half of screen
+- **Restart**: Click restart button or reload page after game over
 
-## 장애물 종류
+### 🎯 Gameplay
+1. **Auto-Running**: Character runs automatically forward
+2. **Obstacle Avoidance**: 
+   - **Red obstacles (high)**: Use slide to duck under
+   - **Teal obstacles (low)**: Use jump to leap over
+3. **Progressive Speed**: Game speed increases with distance traveled
+4. **Scoring System**: Earn points for obstacles passed and distance covered
+5. **Game Over**: Collision with obstacles ends the game
 
-- **높은 장애물** (빨간색): 슬라이드로 통과
-- **낮은 장애물** (청록색): 점프로 통과
+## Game Features
 
-## 점수 시스템
+### 🎮 Core Gameplay
+- **Automatic Running**: Stick figure character runs continuously forward
+- **Dual Movement System**: Jump and slide mechanics for obstacle avoidance
+- **Progressive Difficulty**: Speed increases incrementally with distance
+- **Responsive Controls**: Smooth input handling for precise movement
+- **Endless Gameplay**: Infinite running track with procedural obstacles
 
-- 장애물을 성공적으로 통과할 때마다 10점
-- 달린 거리에 따른 점수 증가
-- 속도가 증가할수록 더 높은 점수
+### 🎨 Visual Features
+- **3D Graphics**: Full Three.js 3D rendering with WebGL
+- **Dynamic Lighting**: Realistic shadows and lighting effects
+- **Particle Systems**: Dust particles and environmental effects
+- **Parallax Scrolling**: Multi-layer background movement for depth
+- **Smooth Animations**: Fluid character and obstacle animations
+
+### 📱 Platform Support
+- **Cross-Platform**: Works on desktop, tablet, and mobile devices
+- **Touch Controls**: Optimized touch interface for mobile gameplay
+- **Responsive Design**: Adapts to various screen sizes and orientations
+- **Performance Optimized**: Maintains 60 FPS on modern devices
+
+## Technical Stack
+
+### Core Technologies
+- **Three.js (r128)**: 3D graphics rendering and scene management
+- **WebGL**: Hardware-accelerated 3D graphics
+- **JavaScript ES6+**: Modern JavaScript with classes and modules
+- **HTML5 Canvas**: Rendering context for 3D graphics
+- **CSS3**: Responsive UI styling and animations
+
+### Development Tools
+- **CDN Integration**: Three.js loaded via CloudFlare CDN
+- **No Build Process**: Direct browser execution
+- **Cross-Browser Compatibility**: Supports all modern browsers
+- **Mobile Optimization**: Touch event handling and performance tuning
+
+## Game Mechanics
+
+### Obstacle System
+- **High Obstacles (Red)**: 
+  - Height: Above player's normal running position
+  - Avoidance: Use slide action to duck underneath
+  - Visual: Red colored geometric shapes
+- **Low Obstacles (Teal)**:
+  - Height: At ground level blocking normal running
+  - Avoidance: Use jump action to leap over
+  - Visual: Teal/cyan colored geometric shapes
+- **Spawn Pattern**: Obstacles appear at regular intervals with increasing frequency
+- **Collision Detection**: Precise 3D collision detection with player model
+
+### Scoring System
+- **Obstacle Points**: 10 points per successfully avoided obstacle
+- **Distance Scoring**: Points awarded based on total distance traveled
+- **Speed Multiplier**: Higher speeds yield increased point values
+- **Bonus System**: Consecutive successful obstacle avoidance provides bonus points
+
+### Physics & Movement
+- **Running Speed**: Starts at base speed, increases with distance
+- **Jump Mechanics**: Fixed jump height and duration with gravity
+- **Slide Mechanics**: Temporary height reduction for ducking
+- **Collision Response**: Immediate game over on obstacle contact
+- **Animation Timing**: Smooth transitions between run, jump, and slide states
+
+## Asset Requirements
+
+### 3D Models & Textures
+- **Character Model**: Stick figure with run/jump/slide animations
+- **Obstacle Models**: Geometric shapes for high and low obstacles
+- **Environment Assets**: Ground texture, background elements
+- **Particle Textures**: Dust and effect sprites
+
+### Audio Assets (Planned)
+- **Running Sounds**: Footstep audio loops
+- **Jump/Slide SFX**: Action sound effects
+- **Collision Sounds**: Game over audio feedback
+- **Background Music**: Optional ambient soundtrack
+
+### UI Elements
+- **Score Display**: Real-time score and distance tracking
+- **Speed Indicator**: Current speed multiplier display
+- **Game Over Screen**: Final score and restart options
+- **Control Instructions**: Input method guidance
+
+## Implementation Status
+
+### ✅ Completed Components
+- **HTML Structure**: Complete responsive game interface
+- **UI Styling**: Gradient backgrounds, buttons, and overlays
+- **Control Instructions**: Desktop and mobile control guidance
+- **Game State Management**: Start screen, game over screen logic
+- **Three.js Integration**: CDN loading and initialization setup
+
+### 🚧 In Development
+- **game.js**: Main game logic implementation needed
+- **3D Scene Setup**: Camera, lighting, and renderer configuration
+- **Character Controller**: Player movement and animation system
+- **Obstacle System**: Procedural obstacle generation and collision
+- **Physics Engine**: Jump/slide mechanics and collision detection
+- **Scoring System**: Point calculation and display updates
+- **Audio Integration**: Sound effect implementation
+
+### 📋 Implementation Plan
+1. **Core Game Loop**: Scene rendering and update cycle
+2. **Player Character**: 3D model loading and animation
+3. **Environment**: Ground plane and background elements
+4. **Obstacle Generation**: Dynamic obstacle spawning system
+5. **Collision Detection**: 3D bounding box collision checking
+6. **UI Integration**: Score updates and game state management
+7. **Performance Optimization**: Frame rate optimization and mobile tuning
+8. **Audio Implementation**: Sound effect integration
+9. **Testing & Polish**: Cross-platform testing and bug fixes
+
+## How to Run
+
+### 🌐 Play Online
+*Online deployment pending game implementation completion*
+
+### 💻 Run Locally
+1. Clone this repository
+2. Navigate to `docs/stick-runner/`
+3. Open `index.html` in a web browser
+4. Complete game.js implementation for full functionality
+5. Use a local web server for optimal performance:
+   ```bash
+   # Using Python
+   python -m http.server 8000
+   
+   # Using Node.js
+   npx serve .
+   
+   # Using PHP
+   php -S localhost:8000
+   ```
+
+### 🛠️ Development Setup
+1. **No Build Process Required**: Direct browser execution
+2. **Three.js CDN**: Automatically loaded from CloudFlare CDN
+3. **Development Server**: Use local server for file loading
+4. **Browser DevTools**: Use for debugging and performance monitoring
+5. **Mobile Testing**: Test on actual devices for touch controls
+
+## Performance Targets
+
+### Desktop Performance
+- **Frame Rate**: Maintain 60 FPS on modern desktops
+- **Resolution**: Support up to 1920x1080 rendering
+- **Memory Usage**: Keep under 100MB total memory consumption
+- **CPU Usage**: Optimize for smooth gameplay on mid-range hardware
+
+### Mobile Performance
+- **Frame Rate**: Target 60 FPS on modern mobile devices, 30 FPS minimum
+- **Touch Response**: <50ms input latency for touch controls
+- **Battery Optimization**: Efficient rendering to minimize battery drain
+- **Memory Management**: Aggressive garbage collection and object pooling
+
+## Browser Compatibility
+
+### Supported Browsers
+- **Chrome**: Version 60+ (recommended)
+- **Firefox**: Version 55+
+- **Safari**: Version 12+ (iOS 12+)
+- **Edge**: Version 79+
+
+### WebGL Requirements
+- **WebGL 1.0**: Minimum requirement for Three.js rendering
+- **Hardware Acceleration**: Required for optimal performance
+- **Mobile GPU**: Support for mobile WebGL implementations
+
+## Development Notes
+
+This game serves as a demonstration of:
+- **3D Web Gaming**: Browser-based 3D game development
+- **Three.js Proficiency**: Advanced 3D graphics programming
+- **Mobile Optimization**: Touch controls and performance tuning
+- **Progressive Difficulty**: Dynamic gameplay balancing
+- **Responsive Design**: Cross-platform user interface development
+
+*Documentation prepared for MVP implementation. Game logic implementation in progress.*
